@@ -86,7 +86,7 @@ export default function Centre({ content, departments, onDepartment }) {
                   }}
                 >
                   <span className="department-top">
-                    <Icon size={28} strokeWidth={1.6} />
+                    <Icon size={48} strokeWidth={1.6} aria-hidden="true" />
                     <span>0{index + 1}</span>
                   </span>
                   <span className="department-name">{department.name}</span>

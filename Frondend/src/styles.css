@@ -2516,7 +2516,8 @@ p {
     margin-bottom: 21px;
   }
   .department-top > svg {
-    width: 25px;
+    width: 40px;
+    height: 40px;
   }
   .department h3 {
     font-size: 15px;
