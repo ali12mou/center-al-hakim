@@ -1,0 +1,24 @@
+{
+  "name": "al-hakim-center",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "Backend",
+    "Frondend"
+  ],
+  "scripts": {
+    "dev": "node Backend/scripts/dev-all.js",
+    "build": "node Backend/scripts/build-frontend.js",
+    "start": "node Backend/index.js",
+    "test": "node --test Backend/tests/*.test.js",
+    "db:seed": "node Backend/seed.js",
+    "test:browser": "node Frondend/tests/browser-check.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
