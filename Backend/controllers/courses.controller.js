@@ -6,8 +6,10 @@ export function createCoursesController({ isDatabaseReady, loadCourses }) {
     if (!isDatabaseReady()) return courses;
     const saved = loadCourses
       ? await loadCourses()
-      : await Course.find({}).select("-_id -__v -createdAt -updatedAt").lean();
-    return saved.length ? saved : courses;
+      : await Course.find({ published: { $ne: false } })
+          .select("-_id -__v -createdAt -updatedAt")
+          .lean();
+    return saved;
   }
   return {
     async list(req, res, next) {

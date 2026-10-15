@@ -44,6 +44,7 @@ const course = new mongoose.Schema(
     tag: String,
     phase: String,
     featured: Boolean,
+    published: { type: Boolean, default: true },
   },
   { timestamps: true },
 );

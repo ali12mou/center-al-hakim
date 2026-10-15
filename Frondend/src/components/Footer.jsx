@@ -13,7 +13,7 @@ export default function Footer({
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <a href="#accueil" aria-label="Retour à l’accueil">
+            <a href="/#accueil" aria-label="Retour à l’accueil">
               <Brand light />
             </a>
             <p>
@@ -76,6 +76,7 @@ export default function Footer({
           <div>
             <button onClick={onLegal}>Informations du centre</button>
             <button onClick={onPrivacy}>Confidentialité</button>
+            <a href="/admin/login">Administration</a>
             <a href="#accueil">Retour en haut ↑</a>
           </div>
         </div>

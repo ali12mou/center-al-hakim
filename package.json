@@ -16,6 +16,8 @@
     "start": "node Backend/index.js",
     "test": "node --test Backend/tests/*.test.js",
     "db:seed": "node Backend/seed.js",
+    "db:init": "node Backend/scripts/init-db.js",
+    "admin:create": "node Backend/scripts/create-admin.js",
     "test:browser": "node Frondend/tests/browser-check.mjs"
   },
   "devDependencies": {

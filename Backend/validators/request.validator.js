@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { courses } from "../data/catalogue.js";
 
 export const requestSchema = z
   .object({
@@ -28,10 +27,7 @@ export const requestSchema = z
   })
   .strict()
   .superRefine((value, context) => {
-    if (
-      value.kind === "registration" &&
-      !courses.some((course) => course.id === value.courseId)
-    ) {
+    if (value.kind === "registration" && !value.courseId) {
       context.addIssue({
         code: "custom",
         path: ["courseId"],

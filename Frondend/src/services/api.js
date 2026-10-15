@@ -1,5 +1,6 @@
 // L’interface ne possède pas les données métier : elle les demande au Backend.
 const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+import { translatePublicData } from '../../../Backend/data/languages.js';
 
 async function get(path) {
   const response = await fetch(`${baseUrl}/api${path}`, {
@@ -13,28 +14,44 @@ async function get(path) {
   return response.json();
 }
 
-export async function getSiteData() {
+export async function getSiteData(language = 'fr') {
   try {
-    const [catalogue, centreData, content, health] = await Promise.all([
+    const [catalogue, centreData, content, health, portal] = await Promise.all([
       get("/courses"),
       get("/centre"),
       get("/content"),
       get("/health"),
+      get("/pages"),
     ]);
-    return {
+    return translatePublicData({
       ...catalogue,
       ...centreData,
       content,
       registrationsAvailable: health.registrationsAvailable,
-    };
+      portal,
+    }, language);
   } catch {
     // L’aperçu hébergé utilise un export PUBLIC créé par le Backend au build.
     // Il ne simule jamais un enregistrement dans MongoDB.
     const response = await fetch("/catalogue.json");
     if (!response.ok)
       throw new Error("Impossible de charger le site. Veuillez réessayer.");
-    return { ...(await response.json()), registrationsAvailable: false };
+    return translatePublicData({ ...(await response.json()), registrationsAvailable: false }, language);
   }
+}
+
+export async function submitAssessment(id, data) {
+  const response = await fetch(`${baseUrl}/api/assessments/${id}/attempts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (!response.ok)
+    throw new Error(
+      result.error || "L’évaluation ne peut pas être enregistrée.",
+    );
+  return result;
 }
 
 export async function sendRequest(data) {

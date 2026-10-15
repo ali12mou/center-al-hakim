@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { createApiRouter } from "./routes/api.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import { createAdminRouter } from "./routes/admin.routes.js";
 
 export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
   const app = express();
@@ -20,7 +21,7 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
-          imgSrc: ["'self'", "data:"],
+          imgSrc: ["'self'", "data:", "https:"],
           fontSrc: ["'self'"],
           connectSrc: ["'self'"],
           upgradeInsecureRequests:
@@ -36,22 +37,24 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
     .map((value) => value.trim());
   app.use(
     cors({
+      credentials: true,
       origin(origin, callback) {
         callback(null, !origin || origins.includes(origin));
       },
     }),
   );
-  app.use(express.json({ limit: "16kb" }));
+  app.use(express.json({ limit: "64kb" }));
   app.use(
     "/api",
     rateLimit({
       windowMs: 60_000,
-      limit: 100,
+      limit: 300,
       standardHeaders: "draft-8",
       legacyHeaders: false,
       message: { error: "Trop de requêtes. Réessayez dans une minute." },
     }),
   );
+  app.use("/api/admin", createAdminRouter(ready));
   app.use(
     "/api",
     createApiRouter({ saveRequest, loadCourses, isDatabaseReady: ready }),
