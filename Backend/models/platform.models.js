@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ["admin"], default: "admin" },
     bootstrap: { type: Boolean, default: false },
+    // Un mot de passe temporaire (script de réinitialisation) doit être remplacé.
+    mustChangePassword: { type: Boolean, default: false },
+    passwordChangedAt: Date,
+    lastLoginAt: Date,
   },
   options,
 );
@@ -56,9 +60,44 @@ const sessionSchema = new mongoose.Schema(
     },
     csrfToken: { type: String, required: true },
     expiresAt: { type: Date, required: true, index: { expires: 0 } },
+    lastSeenAt: { type: Date, default: Date.now },
+    ip: { ...text, default: "" },
+    userAgent: { ...text, default: "" },
   },
   options,
 );
+sessionSchema.index({ userId: 1, createdAt: -1 });
+
+// Échecs de connexion par identifiant haché, que le compte existe ou non :
+// le verrouillage ne révèle donc pas quels identifiants sont valides.
+const loginThrottleSchema = new mongoose.Schema({
+  _id: String,
+  failures: { type: Number, default: 0 },
+  lockedUntil: Date,
+  expiresAt: { type: Date, required: true, index: { expires: 0 } },
+});
+
+export const auditEvents = [
+  "setup",
+  "login_success",
+  "login_failure",
+  "login_locked",
+  "logout",
+  "password_changed",
+  "password_change_failed",
+  "password_reset",
+  "sessions_revoked",
+];
+const auditSchema = new mongoose.Schema({
+  event: { type: String, enum: auditEvents, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "AdminUser" },
+  username: { ...text, default: "" },
+  ip: { ...text, default: "" },
+  userAgent: { ...text, default: "" },
+  // Le journal de sécurité est conservé 180 jours.
+  createdAt: { type: Date, default: Date.now, expires: 180 * 24 * 60 * 60 },
+});
+auditSchema.index({ userId: 1, event: 1, createdAt: -1 });
 
 const registrationSchema = new mongoose.Schema(
   {
@@ -178,6 +217,12 @@ export const AdminSession = mongoose.model(
   sessionSchema,
   "admin_sessions",
 );
+export const LoginThrottle = mongoose.model(
+  "LoginThrottle",
+  loginThrottleSchema,
+  "admin_login_throttle",
+);
+export const AdminAudit = mongoose.model("AdminAudit", auditSchema, "admin_audit");
 export const Registration = mongoose.model(
   "Registration",
   registrationSchema,
@@ -221,6 +266,8 @@ export const PlatformSetting = mongoose.model(
 export const platformModels = [
   AdminUser,
   AdminSession,
+  LoginThrottle,
+  AdminAudit,
   Registration,
   Contact,
   Skill,

@@ -10,6 +10,12 @@ export const loginSchema = z
     password: z.string().min(1).max(128),
   })
   .strict();
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1).max(128),
+    newPassword: z.string().min(1).max(128),
+  })
+  .strict();
 export const setupSchema = z
   .object({
     name: z.string().trim().min(2).max(100),

@@ -9,6 +9,18 @@ import { seedPlatform } from "./services/platform.service.js";
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
 
 mongoose.set("bufferCommands", false);
+// L’API écoute tout de suite : pendant la connexion à MongoDB, elle répond
+// « base indisponible » (503) au lieu d’être injoignable.
+const port = Number(process.env.PORT) || 4100;
+const server = createApp().listen(port, (error) => {
+  if (error) {
+    console.error(
+      `Impossible de démarrer l’API sur le port ${port} : ${error.code}`,
+    );
+    process.exit(1);
+  }
+  console.log(`AL-HAKIM CENTER API : http://127.0.0.1:${port}`);
+});
 if (process.env.MONGODB_URI) {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
@@ -31,16 +43,6 @@ if (process.env.MONGODB_URI) {
     "MONGODB_URI non configuré. Catalogue disponible, enregistrement des demandes désactivé.",
   );
 }
-const port = Number(process.env.PORT) || 4100;
-const server = createApp().listen(port, (error) => {
-  if (error) {
-    console.error(
-      `Impossible de démarrer l’API sur le port ${port} : ${error.code}`,
-    );
-    process.exit(1);
-  }
-  console.log(`AL-HAKIM CENTER API : http://127.0.0.1:${port}`);
-});
 async function shutdown() {
   server.close();
   await mongoose.disconnect();

@@ -9,12 +9,13 @@ import CertificationsPage from "./pages/CertificationsPage.jsx";
 import SkillAssessmentPage from "./pages/SkillAssessmentPage.jsx";
 import InscriptionPage from "./pages/InscriptionPage.jsx";
 import AdminApp from "./admin/AdminApp.jsx";
+import IntroSplash from "./components/IntroSplash.jsx";
 import { LanguageProvider } from './context/LanguageContext.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider><Routes>
+      <LanguageProvider><IntroSplash /><Routes>
         <Route path="/" element={<LandingSite />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/competences" element={<SkillsPage />} />

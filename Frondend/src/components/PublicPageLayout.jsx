@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import PublicNav from "./PublicNav.jsx";
+import LogoLoader from "./LogoLoader.jsx";
 import { getSiteData } from "../services/api.js";
 import { useLanguage } from '../context/LanguageContext.jsx';
 
@@ -46,8 +47,8 @@ export default function PublicPageLayout({
     );
   if (!data)
     return (
-      <main className="loading-screen">
-        <p>Chargement du centre…</p>
+      <main className="loading-screen" aria-busy="true">
+        <LogoLoader label="Chargement du centre…" />
       </main>
     );
   const privacy = () => window.location.assign("/?confidentialite=1#contact");

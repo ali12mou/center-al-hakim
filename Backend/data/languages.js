@@ -3,7 +3,7 @@ const entries = [
   ['Accueil', 'Home', 'الرئيسية'], ['Nos formations', 'Our courses', 'دوراتنا'], ['Le centre', 'The centre', 'المركز'], ['Entreprises', 'Businesses', 'الشركات'], ['Contact', 'Contact', 'اتصل بنا'],
   ['Votre centre de formation à Djibouti', 'Your training centre in Djibouti', 'مركزكم للتدريب في جيبوتي'], ['Préinscription', 'Pre-registration', 'التسجيل الأولي'], ['Ouvrir le menu', 'Open menu', 'فتح القائمة'], ['Fermer le menu', 'Close menu', 'إغلاق القائمة'],
   ['Courses', 'Courses', 'الدورات'], ['Compétences', 'Skills', 'المهارات'], ['Skill Assessment', 'Skill Assessment', 'تقييم المهارات'], ['Businesses', 'Businesses', 'الشركات'], ['Certifications', 'Certifications', 'الشهادات'], ['Blog', 'Blog', 'المدونة'],
-  ['UN NOUVEAU CHAPITRE POUR VOTRE AVENIR', 'A NEW CHAPTER FOR YOUR FUTURE', 'فصل جديد لمستقبلك'],
+  ['UN NOUVEAU CHAPITRE POUR VOTRE AVENIR', 'A NEW CHAPTER FOR YOUR FUTURE', 'فصل جديد لمستقبلك'], ['Passer', 'Skip', 'تخطي'], ['Chargement…', 'Loading…', 'جارٍ التحميل…'],
   ['Apprenez aujourd’hui.', 'Learn today.', 'تعلّم اليوم.'], ['Allez plus loin demain.', 'Go further tomorrow.', 'وانطلق أبعد غداً.'],
   ['Des langues aux compétences numériques, construisez votre avenir avec des formations pratiques, pensées pour le monde professionnel à Djibouti.', 'From languages to digital skills, build your future through practical training designed for the professional world in Djibouti.', 'من اللغات إلى المهارات الرقمية، ابنِ مستقبلك من خلال دورات عملية مصممة للحياة المهنية في جيبوتي.'],
   ['Découvrir les formations', 'Explore our courses', 'اكتشف الدورات'], ['Parlons de votre projet', 'Tell us about your goals', 'لنتحدث عن أهدافك'],

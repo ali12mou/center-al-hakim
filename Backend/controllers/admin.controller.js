@@ -16,6 +16,9 @@ const allModels = {
   contacts: Contact,
   attempts: AssessmentAttempt,
 };
+// hasOwn : « constructor » ou « __proto__ » ne doivent jamais désigner un modèle.
+const modelFor = (models, name) =>
+  Object.hasOwn(models, name) ? models[name] : null;
 const validId = (id) => mongoose.isValidObjectId(id);
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const safePerson = (record) => {
@@ -24,8 +27,14 @@ const safePerson = (record) => {
   return result;
 };
 
+const monthKey = (date) => date.toISOString().slice(0, 7);
 export async function dashboard(req, res, next) {
   try {
+    const now = new Date();
+    // Les 12 derniers mois, mois courant inclus (UTC, comme l’agrégation).
+    const start = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11, 1),
+    );
     const [
       registrations,
       contacts,
@@ -33,8 +42,11 @@ export async function dashboard(req, res, next) {
       published,
       unread,
       attempts,
+      newRegistrations,
       recent,
+      pendingContacts,
       perCourse,
+      perStatus,
       monthly,
     ] = await Promise.all([
       Registration.countDocuments(),
@@ -43,43 +55,88 @@ export async function dashboard(req, res, next) {
       Course.countDocuments({ published: true }),
       Contact.countDocuments({ status: "new" }),
       AssessmentAttempt.countDocuments(),
-      Registration.find().sort({ createdAt: -1 }).limit(5).lean(),
+      Registration.countDocuments({ status: "new" }),
+      Registration.find().sort({ createdAt: -1 }).limit(6).lean(),
+      Contact.find({ status: "new" })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("name email message courseId createdAt")
+        .lean(),
       Registration.aggregate([
         { $group: { _id: "$courseId", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $limit: 6 },
       ]),
       Registration.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+      ]),
+      Registration.aggregate([
+        { $match: { createdAt: { $gte: start } } },
         {
           $group: {
             _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
             count: { $sum: 1 },
           },
         },
-        { $sort: { _id: 1 } },
-        { $limit: 12 },
       ]),
     ]);
     const catalogue = await Course.find().select("id title").lean();
+    const courseTitle = (id) =>
+      catalogue.find((course) => course.id === id)?.title || id || "Non précisé";
+    const months = Array.from({ length: 12 }, (_, index) => {
+      const key = monthKey(
+        new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + index, 1)),
+      );
+      return {
+        month: key,
+        count: monthly.find((item) => item._id === key)?.count || 0,
+      };
+    });
     res.json({
-      counts: { registrations, contacts, courses, published, unread, attempts },
-      recent,
+      counts: {
+        registrations,
+        contacts,
+        courses,
+        published,
+        unread,
+        attempts,
+        newRegistrations,
+        thisMonth: months[11].count,
+        lastMonth: months[10].count,
+      },
+      recent: recent.map((item) => ({
+        ...safePerson(item),
+        courseTitle: courseTitle(item.courseId),
+      })),
+      pendingContacts,
       perCourse: perCourse.map((item) => ({
         ...item,
-        title:
-          catalogue.find((course) => course.id === item._id)?.title ||
-          item._id ||
-          "Non précisé",
+        title: courseTitle(item._id),
       })),
-      monthly,
+      perStatus: ["new", "contacted", "confirmed", "closed"].map((status) => ({
+        status,
+        count: perStatus.find((item) => item._id === status)?.count || 0,
+      })),
+      monthly: months,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+export async function badges(req, res, next) {
+  try {
+    const [contacts, registrations] = await Promise.all([
+      Contact.countDocuments({ status: "new" }),
+      Registration.countDocuments({ status: "new" }),
+    ]);
+    res.json({ contacts, registrations });
   } catch (error) {
     next(error);
   }
 }
 export async function listResource(req, res, next) {
   try {
-    const model = allModels[req.params.resource];
+    const model = modelFor(allModels, req.params.resource);
     if (!model) return res.status(404).json({ error: "Section introuvable." });
     const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
@@ -142,7 +199,7 @@ export async function listResource(req, res, next) {
 export async function saveResource(req, res, next) {
   try {
     const resource = req.params.resource;
-    const model = allModels[resource];
+    const model = modelFor(allModels, resource);
     if (!model || resource === "attempts")
       return res.status(404).json({ error: "Section non modifiable." });
     if (req.params.id && !validId(req.params.id))
@@ -218,7 +275,7 @@ export async function saveResource(req, res, next) {
 }
 export async function deleteResource(req, res, next) {
   try {
-    const model = resourceModels[req.params.resource];
+    const model = modelFor(resourceModels, req.params.resource);
     if (!model || !validId(req.params.id))
       return res
         .status(400)

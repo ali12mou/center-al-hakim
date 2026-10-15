@@ -1,6 +1,7 @@
 // L’interface ne possède pas les données métier : elle les demande au Backend.
 const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 import { translatePublicData } from '../../../Backend/data/languages.js';
+import { trackLoading } from "./loading.js";
 
 async function get(path) {
   const response = await fetch(`${baseUrl}/api${path}`, {
@@ -14,7 +15,10 @@ async function get(path) {
   return response.json();
 }
 
-export async function getSiteData(language = 'fr') {
+export const getSiteData = (language = "fr") =>
+  trackLoading(loadSiteData(language));
+
+async function loadSiteData(language) {
   try {
     const [catalogue, centreData, content, health, portal] = await Promise.all([
       get("/courses"),

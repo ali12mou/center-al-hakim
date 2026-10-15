@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Save } from "lucide-react";
 import Dialog from "../../components/Dialog.jsx";
 import QuestionsEditor from "./QuestionsEditor.jsx";
+import ImageUpload from "./ImageUpload.jsx";
 import { adminApi } from "../services/adminApi.js";
 
 export default function ResourceEditor({
@@ -30,6 +31,7 @@ export default function ResourceEditor({
     ),
   );
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   function set(key, value) {
     setValues((previous) => ({ ...previous, [key]: value }));
@@ -75,6 +77,16 @@ export default function ResourceEditor({
                     onChange={(value) => set(field.key, value)}
                   />
                 </div>
+              );
+            if (field.type === "image")
+              return (
+                <ImageUpload
+                  key={field.key}
+                  label={field.label}
+                  value={values[field.key]}
+                  onChange={(value) => set(field.key, value)}
+                  onBusyChange={setUploading}
+                />
               );
             if (field.type === "checkbox")
               return (
@@ -166,7 +178,9 @@ export default function ResourceEditor({
           <button
             className="button"
             disabled={
-              busy || (resource === "assessments" && !values.questions?.length)
+              busy ||
+              uploading ||
+              (resource === "assessments" && !values.questions?.length)
             }
           >
             <Save size={16} />

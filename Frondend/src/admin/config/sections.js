@@ -10,25 +10,61 @@ import {
   Award,
   Mail,
   Handshake,
+  ShieldCheck,
 } from "lucide-react";
 
-export const menu = [
-  { path: "/admin", label: "Tableau de bord", icon: LayoutDashboard },
-  { path: "/admin/competences", label: "Compétences", icon: GraduationCap },
-  { path: "/admin/informations", label: "Informations", icon: Info },
-  { path: "/admin/registrations", label: "Inscrits", icon: Users },
-  { path: "/admin/blog", label: "Blog", icon: Newspaper },
-  { path: "/admin/courses", label: "Courses", icon: BookOpen },
+// `badge` renvoie au compteur correspondant de /api/admin/badges.
+export const menuGroups = [
   {
-    path: "/admin/assessments",
-    label: "Skill Assessment",
-    icon: ClipboardCheck,
+    label: "Pilotage",
+    items: [
+      { path: "/admin", label: "Tableau de bord", icon: LayoutDashboard },
+    ],
   },
-  { path: "/admin/businesses", label: "Businesses", icon: Building2 },
-  { path: "/admin/certifications", label: "Certifications", icon: Award },
-  { path: "/admin/contacts", label: "Contacts", icon: Mail },
-  { path: "/admin/partners", label: "Partenaires", icon: Handshake },
+  {
+    label: "Apprenants",
+    items: [
+      {
+        path: "/admin/registrations",
+        label: "Inscrits",
+        icon: Users,
+        badge: "registrations",
+      },
+      {
+        path: "/admin/contacts",
+        label: "Contacts",
+        icon: Mail,
+        badge: "contacts",
+      },
+      {
+        path: "/admin/assessments",
+        label: "Skill Assessment",
+        icon: ClipboardCheck,
+      },
+    ],
+  },
+  {
+    label: "Contenu du site",
+    items: [
+      { path: "/admin/courses", label: "Courses", icon: BookOpen },
+      { path: "/admin/competences", label: "Compétences", icon: GraduationCap },
+      { path: "/admin/blog", label: "Blog", icon: Newspaper },
+      { path: "/admin/informations", label: "Informations", icon: Info },
+      { path: "/admin/certifications", label: "Certifications", icon: Award },
+      { path: "/admin/businesses", label: "Businesses", icon: Building2 },
+      { path: "/admin/partners", label: "Partenaires", icon: Handshake },
+    ],
+  },
+  {
+    label: "Compte",
+    items: [
+      { path: "/admin/security", label: "Sécurité", icon: ShieldCheck },
+    ],
+  },
 ];
+export const menu = menuGroups.flatMap((group) =>
+  group.items.map((item) => ({ ...item, group: group.label })),
+);
 const field = (key, label, type = "text", options = {}) => ({
   key,
   label,
@@ -39,7 +75,7 @@ const common = [
   field("title", "Titre", "text", { required: true }),
   field("description", "Description courte", "textarea"),
   field("body", "Contenu", "textarea"),
-  field("imageUrl", "URL de l’image"),
+  field("imageUrl", "Image", "image"),
   field("published", "Publier sur le site", "checkbox"),
 ];
 const departments = [
@@ -226,3 +262,20 @@ export const dateLabel = (value) =>
         timeZone: "Africa/Nairobi",
       }).format(new Date(value))
     : "—";
+export const dateTimeLabel = (value) =>
+  value
+    ? new Intl.DateTimeFormat("fr-FR", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Africa/Nairobi",
+      }).format(new Date(value))
+    : "—";
+export const initials = (name = "") =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("") || "A";

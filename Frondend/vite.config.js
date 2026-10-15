@@ -6,7 +6,11 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { "/api": process.env.API_PROXY_TARGET || "http://127.0.0.1:4100" },
+    proxy: {
+      "/api": process.env.API_PROXY_TARGET || "http://127.0.0.1:4100",
+      // Images importées depuis l’administration, servies par le Backend.
+      "/uploads": process.env.API_PROXY_TARGET || "http://127.0.0.1:4100",
+    },
   },
   preview: { port: 4173 },
 });

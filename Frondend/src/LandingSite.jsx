@@ -12,6 +12,7 @@ import Centre from "./pages/Centre.jsx";
 import Entreprises from "./pages/Entreprises.jsx";
 import Contact from "./pages/Contact.jsx";
 import PublicNav from "./components/PublicNav.jsx";
+import LogoLoader from "./components/LogoLoader.jsx";
 import Partners from "./components/Partners.jsx";
 import { useLanguage } from './context/LanguageContext.jsx';
 
@@ -97,11 +98,7 @@ export default function LandingSite() {
   if (!data)
     return (
       <main className="loading-screen" aria-busy="true">
-        <span className="loading-mark">
-          AH
-          <span />
-        </span>
-        <p>Bienvenue chez AL-HAKIM CENTER…</p>
+        <LogoLoader label="Bienvenue chez AL-HAKIM CENTER…" />
       </main>
     );
   return (

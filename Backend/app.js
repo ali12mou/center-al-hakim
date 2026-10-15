@@ -9,10 +9,19 @@ import path from "node:path";
 import { createApiRouter } from "./routes/api.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { createAdminRouter } from "./routes/admin.routes.js";
+import { UPLOAD_DIR } from "./controllers/upload.controller.js";
 
 export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
   const app = express();
   app.disable("x-powered-by");
+  // Derrière un proxy (Nginx, hébergeur), TRUST_PROXY donne la vraie adresse IP
+  // au limiteur de tentatives et au journal de sécurité.
+  const trustProxy = process.env.TRUST_PROXY;
+  if (trustProxy)
+    app.set(
+      "trust proxy",
+      /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy,
+    );
   const ready = isDatabaseReady || (() => mongoose.connection.readyState === 1);
   app.use(
     helmet({
@@ -58,6 +67,20 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
   app.use(
     "/api",
     createApiRouter({ saveRequest, loadCourses, isDatabaseReady: ready }),
+  );
+
+  // Images importées depuis l’administration : servies comme fichiers inertes.
+  app.use(
+    "/uploads",
+    express.static(UPLOAD_DIR, {
+      index: false,
+      dotfiles: "deny",
+      maxAge: "30d",
+      immutable: true,
+      setHeaders: (res) =>
+        res.set("Content-Security-Policy", "default-src 'none'; sandbox"),
+    }),
+    (_req, res) => res.status(404).end(),
   );
 
   // Node.js peut servir le build React et l’API sur le même domaine.

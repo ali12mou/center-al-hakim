@@ -11,3 +11,4 @@ Frondend/public/catalogue.json
 test-results/
 playwright-report/
 artifacts/
+Backend/uploads/

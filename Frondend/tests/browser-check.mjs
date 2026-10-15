@@ -22,6 +22,8 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 try {
   await page.goto(baseUrl);
+  // L’animation du logo couvre la page tant que celle-ci se charge.
+  await page.locator(".intro").waitFor({ state: "detached" });
   await page.getByRole("heading", { level: 1 }).waitFor();
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: `${directory}/desktop.png`, fullPage: true });

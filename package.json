@@ -18,6 +18,7 @@
     "db:seed": "node Backend/seed.js",
     "db:init": "node Backend/scripts/init-db.js",
     "admin:create": "node Backend/scripts/create-admin.js",
+    "admin:reset": "node Backend/scripts/reset-admin-password.js",
     "test:browser": "node Frondend/tests/browser-check.mjs"
   },
   "devDependencies": {
