@@ -2234,6 +2234,42 @@ a.admin-stat:hover {
 .editor-side .admin-form-grid {
   grid-template-columns: minmax(0, 1fr);
 }
+.editor-media-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--a-muted);
+}
+.editor-media-status.is-saved {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--a-green-soft);
+  color: var(--a-green);
+  font-weight: 600;
+}
+.editor-media-status svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.editor-limits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.editor-limits li {
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--a-blue-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--a-navy);
+}
 .editor-label {
   display: inline-flex;
   gap: 4px;

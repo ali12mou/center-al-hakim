@@ -290,6 +290,9 @@ export const centre = {
   phone: "+253 77 70 13 92",
   phoneLink: "+25377701392",
   whatsapp: "25377701392",
+  // Premier message déjà rédigé quand un visiteur ouvre WhatsApp depuis le site.
+  whatsappMessage:
+    "Bonjour AL-HAKIM CENTER, je vous contacte depuis votre site internet. J’aimerais avoir des informations sur vos formations.",
   email: "info@alhakimcenter.com",
   address: "Balbala, Avenue principale d’Arta",
   landmark: "À côté de GAX Assurance, Djibouti",

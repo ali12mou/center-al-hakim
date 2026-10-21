@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import Brand from "./Brand.jsx";
+import { whatsappLink } from "./whatsapp.js";
 
 export default function Footer({ centre, departments, onPrivacy, onLegal }) {
   return (
@@ -45,7 +46,7 @@ export default function Footer({ centre, departments, onPrivacy, onLegal }) {
               <Mail size={14} /> {centre.email}
             </a>
             <a
-              href={`https://wa.me/${centre.whatsapp}`}
+              href={whatsappLink(centre)}
               target="_blank"
               rel="noreferrer"
             >

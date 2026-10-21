@@ -16,6 +16,7 @@ import LogoLoader from "./components/LogoLoader.jsx";
 import Partners from "./components/Partners.jsx";
 import LatestInformations from "./components/LatestInformations.jsx";
 import { PrivacyContent, LegalContent } from "./components/LegalNotices.jsx";
+import { whatsappLink } from "./components/whatsapp.js";
 import { useLanguage } from './context/LanguageContext.jsx';
 
 export default function LandingSite() {
@@ -131,7 +132,7 @@ export default function LandingSite() {
       />
       <a
         className="whatsapp-float"
-        href={`https://wa.me/${data.centre.whatsapp}`}
+        href={whatsappLink(data.centre)}
         target="_blank"
         rel="noreferrer"
         aria-label="Contacter AL-HAKIM CENTER sur WhatsApp"

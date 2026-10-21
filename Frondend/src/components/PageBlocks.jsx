@@ -7,6 +7,7 @@ import {
   MessageCircle,
   Phone,
 } from "lucide-react";
+import { whatsappLink } from "./whatsapp.js";
 
 const MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=Balbala+Avenue+principale+Arta+GAX+Assurance+Djibouti";
@@ -40,7 +41,7 @@ export function PracticalInfo({ centre }) {
       icon: MessageCircle,
       label: "WhatsApp",
       value: centre.phone,
-      href: `https://wa.me/${centre.whatsapp}`,
+      href: whatsappLink(centre),
       action: "Discuter sur WhatsApp",
     },
   ];

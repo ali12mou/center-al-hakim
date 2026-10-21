@@ -8,8 +8,8 @@ export const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"
 // Vidéos : uniquement pour le diaporama de l’accueil.
 export const VIDEO_TYPES = ["video/mp4", "video/webm"];
 export const UPLOAD_TYPES = [...IMAGE_TYPES, ...VIDEO_TYPES];
-export const MAX_UPLOAD = 5 * 1024 * 1024;
-export const MAX_VIDEO_UPLOAD = 30 * 1024 * 1024;
+export const MAX_UPLOAD = 10 * 1024 * 1024;
+export const MAX_VIDEO_UPLOAD = 60 * 1024 * 1024;
 
 // Le format est déduit des premiers octets, jamais du nom ni du Content-Type envoyé.
 // Le SVG est volontairement exclu : il peut contenir du script.
@@ -48,7 +48,7 @@ export async function uploadImage(req, res, next) {
     if (!Buffer.isBuffer(req.body) || !req.body.length)
       return res.status(400).json({
         error:
-          "Choisissez une image PNG, JPG, WebP ou GIF (5 Mo maximum) ou une vidéo MP4 ou WebM (30 Mo maximum).",
+          "Choisissez une image PNG, JPG, WebP ou GIF (10 Mo maximum) ou une vidéo MP4 ou WebM (60 Mo maximum).",
       });
     const image = imageExtension(req.body);
     const extension = image || videoExtension(req.body);
@@ -58,7 +58,7 @@ export async function uploadImage(req, res, next) {
           "Format non accepté. Utilisez une image PNG, JPG, WebP ou GIF, ou une vidéo MP4 ou WebM.",
       });
     if (image && req.body.length > MAX_UPLOAD)
-      return res.status(413).json({ error: "Image trop lourde : 5 Mo maximum." });
+      return res.status(413).json({ error: "Image trop lourde : 10 Mo maximum." });
     await mkdir(UPLOAD_DIR, { recursive: true });
     // Nom aléatoire : aucun nom de fichier fourni par le navigateur n’atteint le disque.
     const name = `${randomUUID()}.${extension}`;

@@ -28,13 +28,24 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"],
+          // Google Analytics : la balise gtag.js et l’envoi des mesures.
+          scriptSrc: ["'self'", "https://www.googletagmanager.com"],
           styleSrc: ["'self'", "'unsafe-inline'"],
+          // `https:` couvre aussi les pixels de mesure de Google Analytics.
           imgSrc: ["'self'", "data:", "https:"],
           // Vidéos du diaporama : importées (/uploads) ou à une adresse https.
           mediaSrc: ["'self'", "https:"],
           fontSrc: ["'self'"],
-          connectSrc: ["'self'"],
+          // Envoi des mesures Google Analytics (liste officielle de Google pour
+          // GA4 : *.google.com couvre analytics.google.com et www.google.com).
+          connectSrc: [
+            "'self'",
+            "https://*.google-analytics.com",
+            "https://*.analytics.google.com",
+            "https://*.googletagmanager.com",
+            "https://*.g.doubleclick.net",
+            "https://*.google.com",
+          ],
           upgradeInsecureRequests:
             process.env.NODE_ENV === "production" ? [] : null,
         },

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CircleCheck, Save } from "lucide-react";
 import Dialog from "../../components/Dialog.jsx";
 import QuestionsEditor from "./QuestionsEditor.jsx";
 import ImageUpload from "./ImageUpload.jsx";
@@ -59,9 +59,31 @@ export default function ResourceEditor({
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [mediaStatus, setMediaStatus] = useState({});
+  const mediaSaved = useRef(false);
   function set(key, value) {
     setValues((previous) => ({ ...previous, [key]: value }));
   }
+  // Publication existante : l’image ou la vidéo importée (ou retirée) est
+  // enregistrée tout de suite, sans attendre « Enregistrer ».
+  async function changeMedia(key, value) {
+    set(key, value);
+    if (!record?._id) return;
+    setMediaStatus((previous) => ({ ...previous, [key]: "saving" }));
+    try {
+      await adminApi(`/resources/${resource}/${record._id}`, {
+        method: "PATCH",
+        body: { [key]: value },
+      });
+      mediaSaved.current = true;
+      setMediaStatus((previous) => ({ ...previous, [key]: "saved" }));
+    } catch (failure) {
+      setMediaStatus((previous) => ({ ...previous, [key]: "" }));
+      setError(failure.message);
+    }
+  }
+  // Après un enregistrement automatique, la liste est rafraîchie à la fermeture.
+  const close = () => (mediaSaved.current ? onSaved() : onClose());
   // Ouvert depuis « Importer » dans la fiche : on va droit au champ concerné.
   useEffect(() => {
     if (focusKey)
@@ -114,9 +136,27 @@ export default function ResourceEditor({
             label={field.label}
             media={field.type}
             value={values[field.key]}
-            onChange={(value) => set(field.key, value)}
+            onChange={(value) => changeMedia(field.key, value)}
             onBusyChange={setUploading}
           />
+          {mediaStatus[field.key] === "saving" && (
+            <small className="editor-media-status">Enregistrement…</small>
+          )}
+          {mediaStatus[field.key] === "saved" && (
+            <small className="editor-media-status is-saved" role="status">
+              <CircleCheck size={15} />
+              {`${field.type === "video" ? "Vidéo" : "Image"} ${values[field.key] ? "enregistrée" : "retirée"}. `}
+              {record.published
+                ? "Le site public est déjà à jour."
+                : "Activez « Publier sur le site » puis enregistrez pour la montrer aux visiteurs."}
+            </small>
+          )}
+          {!record?._id && values[field.key] && (
+            <small className="editor-media-status">
+              Sera enregistrée avec la publication quand vous cliquerez sur
+              « Enregistrer ».
+            </small>
+          )}
           {field.hint && <small className="editor-hint">{field.hint}</small>}
         </div>
       );
@@ -208,11 +248,24 @@ export default function ResourceEditor({
       fields: config.fields.filter((field) => groupOf(field) === id),
     }))
     .filter((section) => section.fields.length);
+  // Limites rappelées sous « Médias », selon les champs présents.
+  const mediaLimits = (fields) =>
+    [
+      fields.some((field) => field.type === "image") && "Image : 10 Mo maximum.",
+      fields.some((field) => field.type === "video") && "Vidéo : 60 Mo maximum.",
+    ].filter(Boolean);
   const renderSection = ({ id, fields }) => (
     <section key={id} className={`editor-section editor-section-${id}`}>
       <header>
         <h3>{titles[id][0]}</h3>
         <p>{titles[id][1]}</p>
+        {id === "media" && (
+          <ul className="editor-limits">
+            {mediaLimits(fields).map((limit) => (
+              <li key={limit}>{limit}</li>
+            ))}
+          </ul>
+        )}
       </header>
       <div className="admin-form-grid">{fields.map(renderField)}</div>
     </section>
@@ -224,7 +277,7 @@ export default function ResourceEditor({
   return (
     <Dialog
       title={`${record ? "Modifier" : "Ajouter"} · ${config.title}`}
-      onClose={onClose}
+      onClose={close}
       className={side.length ? "admin-editor admin-editor-wide" : "admin-editor"}
     >
       {config.description && (
@@ -259,7 +312,7 @@ export default function ResourceEditor({
           <button
             type="button"
             className="button button-outline"
-            onClick={onClose}
+            onClick={close}
           >
             Annuler
           </button>
@@ -268,6 +321,7 @@ export default function ResourceEditor({
             disabled={
               busy ||
               uploading ||
+              Object.values(mediaStatus).includes("saving") ||
               (resource === "assessments" && !values.questions?.length)
             }
           >

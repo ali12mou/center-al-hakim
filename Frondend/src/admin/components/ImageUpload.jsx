@@ -6,10 +6,14 @@ import { adminApi } from "../services/adminApi.js";
 const kinds = {
   image: {
     types: ["image/png", "image/jpeg", "image/webp", "image/gif"],
-    max: 5 * 1024 * 1024,
-    formats: "PNG, JPG, WebP, GIF · 5 Mo max.",
+    max: 10 * 1024 * 1024,
+    formats: "PNG, JPG, WebP, GIF · 10 Mo max.",
     wrongType: "Format non accepté : choisissez une image PNG, JPG, WebP ou GIF.",
-    tooBig: "Image trop lourde : 5 Mo maximum.",
+    tooBig: "Image trop lourde : 10 Mo maximum.",
+    unreadable:
+      "Impossible de lire cette image sur votre ordinateur. Ouvrez-la une fois (pour qu’elle soit téléchargée si elle est sur OneDrive), ou copiez-la sur le Bureau, puis réessayez.",
+    unplayable:
+      "L’image a été importée, mais le navigateur ne parvient pas à l’afficher : le fichier est peut-être abîmé. Importez-en une autre.",
     importLabel: "Importer une image",
     preview: "Aperçu de l’image",
     placeholder: "https://exemple.com/photo.jpg",
@@ -19,10 +23,14 @@ const kinds = {
   },
   video: {
     types: ["video/mp4", "video/webm"],
-    max: 30 * 1024 * 1024,
-    formats: "MP4, WebM · 30 Mo max.",
+    max: 60 * 1024 * 1024,
+    formats: "MP4, WebM · 60 Mo max.",
     wrongType: "Format non accepté : choisissez une vidéo MP4 ou WebM.",
-    tooBig: "Vidéo trop lourde : 30 Mo maximum.",
+    tooBig: "Vidéo trop lourde : 60 Mo maximum.",
+    unreadable:
+      "Impossible de lire cette vidéo sur votre ordinateur. Ouvrez-la une fois (pour qu’elle soit téléchargée si elle est sur OneDrive), ou copiez-la sur le Bureau, puis réessayez.",
+    unplayable:
+      "La vidéo a été importée, mais le navigateur ne sait pas la lire (souvent une vidéo d’iPhone au format HEVC). Convertissez-la en MP4 « H.264 » (par exemple avec l’application Clipchamp de Windows), puis importez-la de nouveau.",
     importLabel: "Importer une vidéo",
     preview: "Aperçu de la vidéo",
     placeholder: "https://exemple.com/video.mp4",
@@ -57,7 +65,17 @@ export default function ImageUpload({
     if (file.size > kind.max) return setError(kind.tooBig);
     setWorking(true);
     try {
-      const { url } = await adminApi("/uploads", { method: "POST", file });
+      // Copie en mémoire avant l’envoi : Chrome et Edge annulent l’envoi d’un
+      // fichier qui change pendant le transfert (OneDrive qui synchronise,
+      // téléchargement en cours…). La copie, elle, ne bouge plus.
+      let copy;
+      try {
+        copy = new Blob([await file.arrayBuffer()], { type: file.type });
+      } catch {
+        setError(kind.unreadable);
+        return;
+      }
+      const { url } = await adminApi("/uploads", { method: "POST", file: copy });
       setBroken(false);
       onChange(url);
     } catch (failure) {
@@ -140,7 +158,8 @@ export default function ImageUpload({
       </div>
       {broken && value && (
         <small className="image-field-error" role="alert">
-          {kind.broken}
+          {/* Fichier bien importé mais illisible ici : ce n’est pas une page web. */}
+          {value.startsWith("/uploads/") ? kind.unplayable : kind.broken}
         </small>
       )}
       {error && (

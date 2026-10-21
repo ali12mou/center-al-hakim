@@ -79,7 +79,21 @@ export function getStaticPortal() {
     slides: addIds(initialSlides, "slides"),
   };
 }
+// Champs ajoutés aux formations après leur création : on les complète (vides)
+// dans les documents existants pour que toutes les formations aient la même
+// structure. Sans effet une fois fait.
+async function completeCourseFields() {
+  for (const field of ["imageUrl", "videoUrl", "audience", "prerequisites"])
+    await Course.updateMany(
+      { [field]: { $exists: false } },
+      { $set: { [field]: "" } },
+      // Ne pas changer la date de modification : le contenu n’a pas changé.
+      { timestamps: false },
+    );
+}
+
 export async function seedPlatform() {
+  await completeCourseFields();
   // Le diaporama est arrivé après la première installation : il a son propre
   // repère, pour ne pas recréer les diapositives que l’administration supprime.
   if (!(await PlatformSetting.exists({ _id: "home-slides" }))) {

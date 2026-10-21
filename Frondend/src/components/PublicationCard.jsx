@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 
 export function EmptyPublications({
@@ -20,10 +21,17 @@ export default function PublicationCard({
   onView,
   action = "En savoir plus",
 }) {
+  // Adresse qui n’est pas une image (page Pinterest, image supprimée…) : l’icône.
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <article className="publication-card">
-      {item.imageUrl ? (
-        <img src={item.imageUrl} alt="" loading="lazy" />
+      {item.imageUrl && !imageFailed ? (
+        <img
+          src={item.imageUrl}
+          alt=""
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
       ) : (
         <span className="publication-icon">
           <Icon size={32} strokeWidth={1.5} />

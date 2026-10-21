@@ -20,6 +20,13 @@ export function PrivacyContent({ centre }) {
         {centre.email}. Ce site n’utilise pas de traceurs publicitaires.
         L’utilisation de WhatsApp est soumise aux conditions de ce service.
       </p>
+      <h3>Mesure d’audience</h3>
+      <p>
+        Le site utilise Google Analytics pour connaître sa fréquentation : pages
+        consultées, durée des visites, type d’appareil et pays. Le centre n’en
+        consulte que des statistiques globales, jamais reliées aux informations
+        que vous saisissez dans le formulaire.
+      </p>
     </div>
   );
 }
