@@ -260,7 +260,14 @@ export default function ResourcePage({ resource }) {
                         </span>
                       </td>
                       <td>{dateLabel(item.createdAt)}</td>
-                      {resource === "courses" && <td>{item.department}</td>}
+                      {resource === "courses" && (
+                        <td>
+                          {config.fields
+                            .find((field) => field.key === "department")
+                            ?.options.find(([id]) => id === item.department)?.[1] ||
+                            item.department}
+                        </td>
+                      )}
                     </>
                   )}
                   <td>
@@ -361,6 +368,7 @@ export default function ResourcePage({ resource }) {
           resource={resource}
           config={config}
           record={editor.record}
+          focusKey={editor.focusKey}
           courses={courses}
           onClose={() => setEditor(null)}
           onSaved={() => {
@@ -374,6 +382,10 @@ export default function ResourcePage({ resource }) {
           record={view}
           config={config}
           onClose={() => setView(null)}
+          onEdit={(focusKey) => {
+            setView(null);
+            setEditor({ record: view, focusKey });
+          }}
         />
       )}
       {composer && (

@@ -5,53 +5,66 @@ import {
   Search,
   X,
   Users,
-  Languages,
-  BriefcaseBusiness,
-  Monitor,
-  ChartNoAxesCombined,
+  MapPin,
+  ListChecks,
+  Play,
 } from "lucide-react";
+import { courseImage, departmentShortName } from "../components/courseMedia.js";
 
-const icons = {
-  langues: Languages,
-  management: BriefcaseBusiness,
-  informatique: Monitor,
-  finance: ChartNoAxesCombined,
-};
+const normalized = (value) =>
+  value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLocaleLowerCase("fr");
+
 export default function Formations({
   courses,
   departments,
   content,
   onViewCourse,
   departmentRequest,
+  pageSize = 4,
 }) {
   const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
-  const [limit, setLimit] = useState(4);
+  const [limit, setLimit] = useState(pageSize);
   useEffect(() => {
     if (departmentRequest) {
       setCategory(departmentRequest.id);
       setQuery("");
-      setLimit(4);
+      setLimit(pageSize);
     }
   }, [departmentRequest]);
-  const filtered = useMemo(() => {
-    const normalized = (value) =>
-      value
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLocaleLowerCase("fr");
-    return courses.filter(
-      (course) =>
-        (category === "all" || course.department === category) &&
-        normalized(`${course.title} ${course.description}`).includes(
-          normalized(query.trim()),
-        ),
-    );
-  }, [category, query, courses]);
+  const filtered = useMemo(
+    () =>
+      courses.filter(
+        (course) =>
+          (category === "all" || course.department === category) &&
+          normalized(`${course.title} ${course.description}`).includes(
+            normalized(query.trim()),
+          ),
+      ),
+    [category, query, courses],
+  );
+  const counts = useMemo(() => {
+    const result = {};
+    for (const course of courses)
+      result[course.department] = (result[course.department] || 0) + 1;
+    return result;
+  }, [courses]);
+  const selected = departments.find((item) => item.id === category);
   function chooseCategory(value) {
     setCategory(value);
-    setLimit(4);
+    setLimit(pageSize);
   }
+  const filters = [
+    ["all", "Toutes les formations", courses.length],
+    ...departments.map((department) => [
+      department.id,
+      departmentShortName(department),
+      counts[department.id] || 0,
+    ]),
+  ];
   return (
     <section id="formations" className="section catalogue section-anchor">
       <div className="container">
@@ -74,27 +87,16 @@ export default function Formations({
             role="group"
             aria-label="Filtrer les formations par département"
           >
-            <button
-              className={category === "all" ? "filter active" : "filter"}
-              onClick={() => chooseCategory("all")}
-            >
-              Toutes les formations
-            </button>
-            {departments.map((department) => (
+            {filters.map(([value, label, count]) => (
               <button
-                className={
-                  category === department.id ? "filter active" : "filter"
-                }
-                key={department.id}
-                onClick={() => chooseCategory(department.id)}
+                key={value}
+                type="button"
+                className={category === value ? "filter active" : "filter"}
+                aria-pressed={category === value}
+                onClick={() => chooseCategory(value)}
               >
-                {department.id === "management"
-                  ? "Management"
-                  : department.id === "informatique"
-                    ? "Informatique"
-                    : department.id === "finance"
-                      ? "Comptabilité & finance"
-                      : department.name}
+                <span className="filter-label">{label}</span>
+                <span className="filter-count">{count}</span>
               </button>
             ))}
           </div>
@@ -107,7 +109,7 @@ export default function Formations({
               value={query}
               onChange={(event) => {
                 setQuery(event.target.value);
-                setLimit(4);
+                setLimit(pageSize);
               }}
             />
             {query && (
@@ -121,60 +123,86 @@ export default function Formations({
             )}
           </label>
         </div>
-        <p className="sr-only" aria-live="polite">
-          {filtered.length} formations trouvées.
+        <p className="catalogue-summary" aria-live="polite">
+          <strong>{filtered.length}</strong>{" "}
+          {filtered.length > 1 ? "formations" : "formation"}
+          {selected && ` · ${selected.name}`}
+          {query.trim() && ` · « ${query.trim()} »`}
         </p>
         <div className="course-grid">
           {filtered.slice(0, limit).map((course) => {
             const department = departments.find(
               (item) => item.id === course.department,
             );
-            const Icon = icons[course.department];
+            const view = () => onViewCourse(course);
             return (
               <article className="course-card" key={course.id}>
                 <button
-                  className="course-image-button"
+                  className="course-media"
                   type="button"
-                  onClick={() => onViewCourse(course)}
+                  onClick={view}
                   aria-label={`Découvrir ${course.title}`}
                 >
                   <img
-                    src={`/images/${course.image}.jpg`}
+                    src={courseImage(course)}
                     alt=""
                     loading="lazy"
                     width="640"
                     height="420"
+                    onError={(event) => {
+                      // Image importée introuvable : illustration du pôle.
+                      const fallback = `/images/${course.image || course.department}.jpg`;
+                      if (!event.currentTarget.src.endsWith(fallback))
+                        event.currentTarget.src = fallback;
+                    }}
                   />
                   <span className={`pill pill-${department.color}`}>
                     {course.tag || department.name}
                   </span>
-                  <span className="course-image-icon">
-                    <Icon size={19} />
-                  </span>
+                  {course.videoUrl && (
+                    <span className="course-badge">
+                      <Play size={11} fill="currentColor" /> Vidéo
+                    </span>
+                  )}
+                  {course.phase && (
+                    <span className="course-badge course-badge-soon">
+                      À venir
+                    </span>
+                  )}
                 </button>
                 <div className="course-card-body">
-                  <span className="course-level">
-                    <Users size={13} /> {course.level}
-                  </span>
+                  <div className="course-meta">
+                    <span>
+                      <Users size={14} /> {course.level}
+                    </span>
+                    <span>
+                      <MapPin size={14} /> {course.format}
+                    </span>
+                  </div>
                   <h3>
-                    <button onClick={() => onViewCourse(course)}>
+                    <button type="button" onClick={view}>
                       {course.title}
                     </button>
                   </h3>
                   <p>{course.description}</p>
-                  <div className="course-card-bottom">
-                    <span>
-                      {course.phase ? "À venir" : "Programme proposé"}
+                  {course.topics?.length > 0 && (
+                    <span className="course-topics">
+                      <ListChecks size={15} /> {course.topics.length} thèmes
+                      au programme
                     </span>
-                    <button
-                      className="course-link"
-                      onClick={() => onViewCourse(course)}
-                      aria-label={`Voir le programme ${course.title}`}
-                    >
-                      Le programme <ArrowUpRight size={17} />
-                    </button>
-                  </div>
+                  )}
                 </div>
+                <button
+                  type="button"
+                  className="course-card-footer"
+                  onClick={view}
+                  aria-label={`Voir le programme ${course.title}`}
+                >
+                  Découvrir le programme
+                  <span className="course-card-arrow">
+                    <ArrowUpRight size={16} />
+                  </span>
+                </button>
               </article>
             );
           })}
@@ -202,7 +230,8 @@ export default function Formations({
               className="button button-outline"
               onClick={() => setLimit((value) => value + 8)}
             >
-              Voir plus de formations <ArrowDown size={16} />
+              Voir plus de formations ({filtered.length - limit})
+              <ArrowDown size={16} />
             </button>
           )}
         </div>

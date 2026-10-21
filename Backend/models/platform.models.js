@@ -210,6 +210,19 @@ const partnerSchema = new mongoose.Schema(
   },
   options,
 );
+// Diapositives du premier bloc de l’accueil (menu « Accueil » de l’administration).
+const slideSchema = new mongoose.Schema(
+  {
+    ...publishFields,
+    eyebrow: { ...text, maxlength: 120, default: "" },
+    accent: { ...text, maxlength: 200, default: "" },
+    buttonLabel: { ...text, maxlength: 60, default: "" },
+    buttonLink: { ...text, maxlength: 1000, default: "" },
+    videoUrl: { ...text, maxlength: 1000, default: "" },
+    order: { type: Number, min: 0, max: 99, default: 1 },
+  },
+  options,
+);
 
 export const AdminUser = mongoose.model("AdminUser", userSchema, "admin_users");
 export const AdminSession = mongoose.model(
@@ -257,6 +270,7 @@ export const AssessmentAttempt = mongoose.model(
   "assessment_attempts",
 );
 export const Partner = mongoose.model("Partner", partnerSchema, "partners");
+export const HomeSlide = mongoose.model("HomeSlide", slideSchema, "home_slides");
 export const PlatformSetting = mongoose.model(
   "PlatformSetting",
   new mongoose.Schema({ _id: String, initializedAt: Date }),
@@ -278,5 +292,6 @@ export const platformModels = [
   Assessment,
   AssessmentAttempt,
   Partner,
+  HomeSlide,
   PlatformSetting,
 ];

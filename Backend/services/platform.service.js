@@ -7,6 +7,7 @@ import {
   Certification,
   Assessment,
   Partner,
+  HomeSlide,
   PlatformSetting,
 } from "../models/platform.models.js";
 import { courses } from "../data/catalogue.js";
@@ -17,6 +18,7 @@ import {
   initialAssessments,
   initialPartners,
   initialInformation,
+  initialSlides,
 } from "../data/platformContent.js";
 
 export const resourceModels = {
@@ -28,6 +30,7 @@ export const resourceModels = {
   certifications: Certification,
   assessments: Assessment,
   partners: Partner,
+  slides: HomeSlide,
 };
 export async function getPublicPortal() {
   const entries = await Promise.all(
@@ -36,7 +39,8 @@ export async function getPublicPortal() {
       .map(async ([key, model]) => {
         const records = await model
           .find({ published: true })
-          .sort({ createdAt: -1 })
+          // Le diaporama suit l’ordre choisi ; le reste, du plus récent au plus ancien.
+          .sort(key === "slides" ? { order: 1, createdAt: 1 } : { createdAt: -1 })
           .limit(100)
           .select("-__v")
           .lean();
@@ -72,9 +76,21 @@ export function getStaticPortal() {
       })),
     })),
     partners: addIds(initialPartners, "partners"),
+    slides: addIds(initialSlides, "slides"),
   };
 }
 export async function seedPlatform() {
+  // Le diaporama est arrivé après la première installation : il a son propre
+  // repère, pour ne pas recréer les diapositives que l’administration supprime.
+  if (!(await PlatformSetting.exists({ _id: "home-slides" }))) {
+    if ((await HomeSlide.countDocuments()) === 0)
+      await HomeSlide.insertMany(initialSlides);
+    await PlatformSetting.updateOne(
+      { _id: "home-slides" },
+      { $setOnInsert: { initializedAt: new Date() } },
+      { upsert: true },
+    );
+  }
   if (await PlatformSetting.exists({ _id: "initial-content" })) return;
   const seeds = [
     [Skill, initialSkills],

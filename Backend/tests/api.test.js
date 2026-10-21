@@ -45,7 +45,7 @@ test("coordonnées et contenu des pages servis par le Backend", async () => {
   await withApi({}, async (origin) => {
     const { centre } = await (await fetch(`${origin}/api/centre`)).json();
     const content = await (await fetch(`${origin}/api/content`)).json();
-    assert.equal(centre.phoneLink, "+25377756638");
+    assert.equal(centre.phoneLink, "+25377701392");
     assert.equal(content.navigation.length, 5);
   });
 });

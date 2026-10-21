@@ -176,3 +176,46 @@ export const initialInformation = [
     published: true,
   },
 ];
+// Diaporama de l’accueil : repris des textes et visuels existants, modifiable
+// ensuite depuis le menu « Accueil » de l’administration.
+export const initialSlides = [
+  {
+    eyebrow: "UN NOUVEAU CHAPITRE POUR VOTRE AVENIR",
+    title: "Apprenez aujourd’hui.",
+    accent: "Allez plus loin demain.",
+    description:
+      "Des langues aux compétences numériques, construisez votre avenir avec des formations pratiques, pensées pour le monde professionnel à Djibouti.",
+    body: "Étudiants, professionnels, entrepreneurs : votre prochaine étape commence ici.",
+    buttonLabel: "Découvrir les formations",
+    buttonLink: "/formations",
+    imageUrl: "/images/hero-classroom.jpg",
+    order: 1,
+    published: true,
+  },
+  {
+    eyebrow: "TROUVEZ VOTRE PROCHAINE ÉTAPE",
+    title: "Une compétence.",
+    accent: "De nouvelles possibilités.",
+    description:
+      "Choisissez le parcours qui donne du sens à vos ambitions.",
+    body: "Langues, management, informatique, comptabilité : quatre pôles pour progresser.",
+    buttonLabel: "Découvrir les formations",
+    buttonLink: "/formations",
+    imageUrl: "/images/informatique.jpg",
+    order: 2,
+    published: true,
+  },
+  {
+    eyebrow: "POUR LES ENTREPRISES & LES INSTITUTIONS",
+    title: "Faites grandir les compétences de vos équipes.",
+    accent: "",
+    description:
+      "Un besoin spécifique ? Construisons un programme adapté à votre activité, à vos collaborateurs et à vos objectifs.",
+    body: "",
+    buttonLabel: "Discutons de vos besoins",
+    buttonLink: "/entreprises",
+    imageUrl: "/images/management.jpg",
+    order: 3,
+    published: true,
+  },
+];

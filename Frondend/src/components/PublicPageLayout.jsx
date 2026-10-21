@@ -35,6 +35,14 @@ export default function PublicPageLayout({
   children,
 }) {
   const { t } = useLanguage();
+  const ready = Boolean(data);
+  // Une adresse comme /entreprises#contact vise un bloc qui n’existe qu’une
+  // fois les données chargées : on s’y rend à ce moment-là.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (ready && id)
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }, [ready]);
   if (error)
     return (
       <main className="loading-screen">
@@ -54,13 +62,9 @@ export default function PublicPageLayout({
   const privacy = () => window.location.assign("/?confidentialite=1#contact");
   return (
     <>
-      <Header
-        centre={data.centre}
-        navigation={data.content.navigation}
-        active=""
-      />
+      <Header centre={data.centre} navigation={data.content.navigation} />
       <PublicNav />
-      <main>
+      <main id="contenu">
         <div className="page-intro">
           <div className="container">
             <div className="breadcrumb">
@@ -80,7 +84,6 @@ export default function PublicPageLayout({
         departments={data.departments}
         onPrivacy={privacy}
         onLegal={() => window.location.assign("/?informations=1")}
-        onDepartment={(id) => window.location.assign(`/#formations`)}
       />
     </>
   );

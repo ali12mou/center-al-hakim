@@ -107,6 +107,17 @@ export const contentSchemas = {
         .max(30),
     })
     .strict(),
+  slides: z
+    .object({
+      ...contentFields,
+      eyebrow: z.string().trim().max(120).default(""),
+      accent: z.string().trim().max(200).default(""),
+      buttonLabel: z.string().trim().max(60).default(""),
+      buttonLink: safeUrl,
+      videoUrl: safeUrl,
+      order: z.coerce.number().int().min(0).max(99).default(1),
+    })
+    .strict(),
   partners: z
     .object({
       ...contentFields,
@@ -134,6 +145,10 @@ export const contentSchemas = {
       image: z
         .enum(["langues", "management", "informatique", "finance"])
         .default("informatique"),
+      imageUrl: safeUrl,
+      videoUrl: safeUrl,
+      audience: z.string().trim().max(300).default(""),
+      prerequisites: z.string().trim().max(500).default(""),
       tag: z.string().max(80).default(""),
       phase: z.string().max(100).default(""),
       featured: z.boolean().default(false),

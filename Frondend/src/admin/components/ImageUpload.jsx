@@ -3,10 +3,43 @@ import { ImagePlus, Link2, LoaderCircle, Trash2, UploadCloud } from "lucide-reac
 import { adminApi } from "../services/adminApi.js";
 
 // Mêmes limites que le Backend : vérifiées ici pour répondre tout de suite.
-const TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
-const MAX = 5 * 1024 * 1024;
+const kinds = {
+  image: {
+    types: ["image/png", "image/jpeg", "image/webp", "image/gif"],
+    max: 5 * 1024 * 1024,
+    formats: "PNG, JPG, WebP, GIF · 5 Mo max.",
+    wrongType: "Format non accepté : choisissez une image PNG, JPG, WebP ou GIF.",
+    tooBig: "Image trop lourde : 5 Mo maximum.",
+    importLabel: "Importer une image",
+    preview: "Aperçu de l’image",
+    placeholder: "https://exemple.com/photo.jpg",
+    urlLabel: "Adresse web de l’image",
+    broken:
+      "Cette adresse n’affiche pas d’image (une page web n’est pas une image). Importez plutôt le fichier.",
+  },
+  video: {
+    types: ["video/mp4", "video/webm"],
+    max: 30 * 1024 * 1024,
+    formats: "MP4, WebM · 30 Mo max.",
+    wrongType: "Format non accepté : choisissez une vidéo MP4 ou WebM.",
+    tooBig: "Vidéo trop lourde : 30 Mo maximum.",
+    importLabel: "Importer une vidéo",
+    preview: "Aperçu de la vidéo",
+    placeholder: "https://exemple.com/video.mp4",
+    urlLabel: "Adresse web de la vidéo",
+    broken:
+      "Cette adresse ne lit pas de vidéo (une page YouTube n’est pas un fichier vidéo). Importez plutôt le fichier MP4 ou WebM.",
+  },
+};
 
-export default function ImageUpload({ label, value, onChange, onBusyChange }) {
+export default function ImageUpload({
+  label,
+  value,
+  onChange,
+  onBusyChange,
+  media = "image",
+}) {
+  const kind = kinds[media];
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -20,9 +53,8 @@ export default function ImageUpload({ label, value, onChange, onBusyChange }) {
   async function upload(file) {
     if (!file) return;
     setError("");
-    if (!TYPES.includes(file.type))
-      return setError("Format non accepté : choisissez une image PNG, JPG, WebP ou GIF.");
-    if (file.size > MAX) return setError("Image trop lourde : 5 Mo maximum.");
+    if (!kind.types.includes(file.type)) return setError(kind.wrongType);
+    if (file.size > kind.max) return setError(kind.tooBig);
     setWorking(true);
     try {
       const { url } = await adminApi("/uploads", { method: "POST", file });
@@ -58,7 +90,19 @@ export default function ImageUpload({ label, value, onChange, onBusyChange }) {
       >
         {value && !broken ? (
           <>
-            <img src={value} alt="Aperçu de l’image" onError={() => setBroken(true)} />
+            {media === "video" ? (
+              <video
+                src={value}
+                aria-label={kind.preview}
+                muted
+                playsInline
+                controls
+                preload="metadata"
+                onError={() => setBroken(true)}
+              />
+            ) : (
+              <img src={value} alt={kind.preview} onError={() => setBroken(true)} />
+            )}
             <div className="image-drop-actions">
               <button type="button" onClick={choose} disabled={busy}>
                 <ImagePlus size={16} />
@@ -82,22 +126,21 @@ export default function ImageUpload({ label, value, onChange, onBusyChange }) {
             ) : (
               <UploadCloud size={28} />
             )}
-            <strong>{busy ? "Import en cours…" : "Importer une image"}</strong>
-            <small>Cliquez ou glissez-déposez · PNG, JPG, WebP, GIF · 5 Mo max.</small>
+            <strong>{busy ? "Import en cours…" : kind.importLabel}</strong>
+            <small>Cliquez ou glissez-déposez · {kind.formats}</small>
           </button>
         )}
         <input
           ref={input}
           type="file"
-          accept={TYPES.join(",")}
+          accept={kind.types.join(",")}
           hidden
           onChange={(event) => upload(event.target.files[0])}
         />
       </div>
       {broken && value && (
         <small className="image-field-error" role="alert">
-          Cette adresse n’affiche pas d’image (une page web n’est pas une image).
-          Importez plutôt le fichier.
+          {kind.broken}
         </small>
       )}
       {error && (
@@ -118,8 +161,8 @@ export default function ImageUpload({ label, value, onChange, onBusyChange }) {
           className="image-url-input"
           value={value}
           maxLength={1000}
-          placeholder="https://exemple.com/photo.jpg"
-          aria-label="Adresse web de l’image"
+          placeholder={kind.placeholder}
+          aria-label={kind.urlLabel}
           onChange={(event) => {
             setBroken(false);
             onChange(event.target.value);

@@ -1,13 +1,8 @@
-import { ArrowUpRight, MapPin, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import Brand from "./Brand.jsx";
 
-export default function Footer({
-  centre,
-  departments,
-  onPrivacy,
-  onLegal,
-  onDepartment,
-}) {
+export default function Footer({ centre, departments, onPrivacy, onLegal }) {
   return (
     <footer className="footer">
       <div className="container">
@@ -25,32 +20,29 @@ export default function Footer({
           </div>
           <div>
             <h3>Explorez le centre</h3>
-            <a href="#formations">Nos formations</a>
-            <a href="#centre">Notre mission</a>
-            <a href="#entreprises">Formations entreprises</a>
-            <a href="#contact">
+            <Link to="/formations">Nos formations</Link>
+            <Link to="/centre">Notre mission</Link>
+            <Link to="/entreprises">Formations entreprises</Link>
+            <Link to="/contact">Contact</Link>
+            <Link to="/inscription">
               Préinscription <ArrowUpRight size={13} />
-            </a>
+            </Link>
           </div>
           <div>
             <h3>Nos domaines</h3>
             {departments.map((department) => (
-              <a
-                href="#formations"
-                key={department.id}
-                onClick={(event) => {
-                  event.preventDefault();
-                  onDepartment(department.id);
-                }}
-              >
+              <Link to={`/formations?pole=${department.id}`} key={department.id}>
                 {department.name}
-              </a>
+              </Link>
             ))}
           </div>
           <div>
             <h3>Restons en contact</h3>
             <a href={`tel:${centre.phoneLink}`}>
               <Phone size={14} /> {centre.phone}
+            </a>
+            <a href={`mailto:${centre.email}`}>
+              <Mail size={14} /> {centre.email}
             </a>
             <a
               href={`https://wa.me/${centre.whatsapp}`}
@@ -77,7 +69,15 @@ export default function Footer({
             <button onClick={onLegal}>Informations du centre</button>
             <button onClick={onPrivacy}>Confidentialité</button>
             <a href="/admin/login">Administration</a>
-            <a href="#accueil">Retour en haut ↑</a>
+            <a
+              href="#contenu"
+              onClick={(event) => {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              Retour en haut ↑
+            </a>
           </div>
         </div>
       </div>

@@ -1,7 +1,14 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 
-export default function Dialog({ title, children, onClose, className = "" }) {
+// `media` : image ou vidéo affichée sur toute la largeur, au-dessus du titre.
+export default function Dialog({
+  title,
+  children,
+  onClose,
+  className = "",
+  media = null,
+}) {
   const ref = useRef(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -26,15 +33,16 @@ export default function Dialog({ title, children, onClose, className = "" }) {
         if (event.target === ref.current) onClose();
       }}
     >
+      <button
+        type="button"
+        className="icon-button dialog-close"
+        onClick={onClose}
+        aria-label="Fermer la fenêtre"
+      >
+        <X size={21} />
+      </button>
+      {media}
       <div className="dialog-inner">
-        <button
-          type="button"
-          className="icon-button dialog-close"
-          onClick={onClose}
-          aria-label="Fermer la fenêtre"
-        >
-          <X size={21} />
-        </button>
         <h2 id="dialog-title">{title}</h2>
         {children}
       </div>

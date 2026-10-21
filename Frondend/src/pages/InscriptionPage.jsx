@@ -26,6 +26,7 @@ export default function InscriptionPage() {
         <Contact
           centre={data.centre}
           courses={data.courses}
+          departments={data.departments}
           registrationsAvailable={data.registrationsAvailable}
           request={request}
           onPrivacy={() => setPrivacy(true)}

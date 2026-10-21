@@ -31,6 +31,8 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
           scriptSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", "data:", "https:"],
+          // Vidéos du diaporama : importées (/uploads) ou à une adresse https.
+          mediaSrc: ["'self'", "https:"],
           fontSrc: ["'self'"],
           connectSrc: ["'self'"],
           upgradeInsecureRequests:

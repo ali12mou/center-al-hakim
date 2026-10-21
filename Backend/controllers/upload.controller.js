@@ -4,8 +4,12 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 export const UPLOAD_DIR = fileURLToPath(new URL("../uploads/", import.meta.url));
-export const UPLOAD_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+export const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+// Vidéos : uniquement pour le diaporama de l’accueil.
+export const VIDEO_TYPES = ["video/mp4", "video/webm"];
+export const UPLOAD_TYPES = [...IMAGE_TYPES, ...VIDEO_TYPES];
 export const MAX_UPLOAD = 5 * 1024 * 1024;
+export const MAX_VIDEO_UPLOAD = 30 * 1024 * 1024;
 
 // Le format est déduit des premiers octets, jamais du nom ni du Content-Type envoyé.
 // Le SVG est volontairement exclu : il peut contenir du script.
@@ -23,18 +27,38 @@ export const imageExtension = (buffer) =>
   Buffer.isBuffer(buffer) && buffer.length > 12
     ? signatures.find(([, test]) => test(buffer))?.[0] || null
     : null;
+// MP4 : boîte « ftyp » suivie d’une marque lue par les navigateurs (pas HEIC ni QuickTime).
+const mp4Brands = ["isom", "iso2", "iso4", "iso5", "iso6", "mp41", "mp42", "avc1", "dash", "M4V "];
+const videoSignatures = [
+  [
+    "mp4",
+    (b) =>
+      b.toString("ascii", 4, 8) === "ftyp" &&
+      mp4Brands.includes(b.toString("ascii", 8, 12)),
+  ],
+  ["webm", (b) => b.subarray(0, 4).equals(Buffer.from("1a45dfa3", "hex"))],
+];
+export const videoExtension = (buffer) =>
+  Buffer.isBuffer(buffer) && buffer.length > 12
+    ? videoSignatures.find(([, test]) => test(buffer))?.[0] || null
+    : null;
 
 export async function uploadImage(req, res, next) {
   try {
     if (!Buffer.isBuffer(req.body) || !req.body.length)
       return res.status(400).json({
-        error: "Choisissez une image PNG, JPG, WebP ou GIF de 5 Mo maximum.",
+        error:
+          "Choisissez une image PNG, JPG, WebP ou GIF (5 Mo maximum) ou une vidéo MP4 ou WebM (30 Mo maximum).",
       });
-    const extension = imageExtension(req.body);
+    const image = imageExtension(req.body);
+    const extension = image || videoExtension(req.body);
     if (!extension)
       return res.status(415).json({
-        error: "Format non accepté. Utilisez une image PNG, JPG, WebP ou GIF.",
+        error:
+          "Format non accepté. Utilisez une image PNG, JPG, WebP ou GIF, ou une vidéo MP4 ou WebM.",
       });
+    if (image && req.body.length > MAX_UPLOAD)
+      return res.status(413).json({ error: "Image trop lourde : 5 Mo maximum." });
     await mkdir(UPLOAD_DIR, { recursive: true });
     // Nom aléatoire : aucun nom de fichier fourni par le navigateur n’atteint le disque.
     const name = `${randomUUID()}.${extension}`;

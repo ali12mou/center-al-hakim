@@ -18,7 +18,7 @@ export default function InformationPage() {
       <section className="section">
         <div className="container information-list">
           {items.map((item) => (
-            <article key={item._id}>
+            <article key={item._id} id={`info-${item._id}`}>
               <Info size={26} />
               <div>
                 <span className="eyebrow">{item.category}</span>

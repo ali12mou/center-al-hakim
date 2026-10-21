@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { MapPin, Phone, ArrowUpRight, Menu, X, ShieldCheck } from "lucide-react";
+import { Link, NavLink } from "react-router-dom";
+import { MapPin, Phone, Mail, ArrowUpRight, Menu, X, ShieldCheck } from "lucide-react";
 import Brand from "./Brand.jsx";
 import { useLanguage } from '../context/LanguageContext.jsx';
 
-export default function Header({ centre, navigation, active }) {
+// Chaque entrée du menu est une page : l’onglet actif suit l’adresse affichée.
+export default function Header({ centre, navigation }) {
   const [open, setOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   return (
@@ -15,6 +17,9 @@ export default function Header({ centre, navigation, active }) {
           </span>
           <div className="topbar-tools"><a href={`tel:${centre.phoneLink}`} dir="ltr">
             <Phone size={13} /> {centre.phone}
+          </a>
+          <a href={`mailto:${centre.email}`} className="topbar-email" dir="ltr" aria-label={centre.email} title={centre.email}>
+            <Mail size={13} /> <span>{centre.email}</span>
           </a>
           <a href="/admin/login" className="admin-access" aria-label="Accès administrateur" title="Accès administrateur">
             <ShieldCheck size={16} /> <span>{t('Administration')}</span>
@@ -37,22 +42,20 @@ export default function Header({ centre, navigation, active }) {
             className={open ? "nav nav-open" : "nav"}
           >
             {navigation.map((item) => (
-              <a
+              <NavLink
                 key={item.href}
-                href={item.href.startsWith("#") ? `/${item.href}` : item.href}
-                className={active === item.href.slice(1) ? "nav-active" : ""}
-                aria-current={
-                  active === item.href.slice(1) ? "location" : undefined
-                }
+                to={item.href}
+                end={item.href === "/"}
+                className={({ isActive }) => (isActive ? "nav-active" : "")}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
-              </a>
+              </NavLink>
             ))}
           </nav>
-          <a href="/inscription" className="button button-small header-cta">
+          <Link to="/inscription" className="button button-small header-cta">
             {t('Préinscription')} <ArrowUpRight size={16} />
-          </a>
+          </Link>
           <button
             className="mobile-menu icon-button"
             type="button"

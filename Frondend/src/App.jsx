@@ -1,6 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import LandingSite from "./LandingSite.jsx";
-import CoursesPage from "./pages/CoursesPage.jsx";
+import FormationsPage from "./pages/FormationsPage.jsx";
+import CentrePage from "./pages/CentrePage.jsx";
+import EntreprisesPage from "./pages/EntreprisesPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
 import SkillsPage from "./pages/SkillsPage.jsx";
 import InformationPage from "./pages/InformationPage.jsx";
 import BlogPage from "./pages/BlogPage.jsx";
@@ -12,12 +16,28 @@ import AdminApp from "./admin/AdminApp.jsx";
 import IntroSplash from "./components/IntroSplash.jsx";
 import { LanguageProvider } from './context/LanguageContext.jsx';
 
+// En changeant de page, on repart du haut (sauf lien vers un bloc précis).
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0);
+  }, [pathname, hash]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider><IntroSplash /><Routes>
+      <LanguageProvider><IntroSplash /><ScrollToTop /><Routes>
         <Route path="/" element={<LandingSite />} />
-        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/formations" element={<FormationsPage />} />
+        <Route path="/centre" element={<CentrePage />} />
+        <Route path="/entreprises" element={<EntreprisesPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route
+          path="/courses"
+          element={<FormationsPage eyebrow="COURSES · NOS FORMATIONS" />}
+        />
         <Route path="/competences" element={<SkillsPage />} />
         <Route path="/informations" element={<InformationPage />} />
         <Route path="/blog" element={<BlogPage />} />

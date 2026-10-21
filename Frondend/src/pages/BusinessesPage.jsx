@@ -34,7 +34,7 @@ export default function BusinessesPage() {
                   </li>
                 ))}
               </ul>
-              <a href="/?demande=enterprise#contact" className="button">
+              <a href="/entreprises#contact" className="button">
                 Parlons de vos besoins <ArrowUpRight size={17} />
               </a>
             </article>

@@ -41,6 +41,11 @@ const course = new mongoose.Schema(
     duration: String,
     format: String,
     image: String,
+    // Image et vidéo importées depuis l’administration (prioritaires sur `image`).
+    imageUrl: { type: String, default: "" },
+    videoUrl: { type: String, default: "" },
+    audience: { type: String, default: "" },
+    prerequisites: { type: String, default: "" },
     tag: String,
     phase: String,
     featured: Boolean,

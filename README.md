@@ -15,7 +15,7 @@ npm run dev
 - API Node.js : **http://127.0.0.1:4100/api/health**
 - `Ctrl+C` arrête les serveurs.
 
-Le catalogue et les pages fonctionnent même sans MongoDB. Pour enregistrer les demandes de préinscription, configurez MongoDB comme expliqué ci-dessous. Tant que la base n’est pas connectée, le formulaire prépare un message WhatsApp que le visiteur peut vérifier et envoyer au **+253 77 75 66 38**.
+Le catalogue et les pages fonctionnent même sans MongoDB. Pour enregistrer les demandes de préinscription, configurez MongoDB comme expliqué ci-dessous. Tant que la base n’est pas connectée, le formulaire prépare un message WhatsApp que le visiteur peut vérifier et envoyer au **+253 77 70 13 92**.
 
 ## Les deux dossiers
 

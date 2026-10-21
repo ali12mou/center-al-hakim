@@ -38,7 +38,7 @@ export default function CertificationsPage() {
                 ))}
               </ul>
               <span className="certification-note">{item.accreditation}</span>
-              <a href="/?demande=contact#contact" className="text-link">
+              <a href="/contact" className="text-link">
                 Demander les modalités
               </a>
             </article>

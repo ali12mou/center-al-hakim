@@ -287,9 +287,10 @@ export const courses = [
 
 export const centre = {
   name: "AL-HAKIM CENTER",
-  phone: "+253 77 75 66 38",
-  phoneLink: "+25377756638",
-  whatsapp: "25377756638",
+  phone: "+253 77 70 13 92",
+  phoneLink: "+25377701392",
+  whatsapp: "25377701392",
+  email: "info@alhakimcenter.com",
   address: "Balbala, Avenue principale d’Arta",
   landmark: "À côté de GAX Assurance, Djibouti",
   slogan: "Learn Today. Lead Tomorrow.",

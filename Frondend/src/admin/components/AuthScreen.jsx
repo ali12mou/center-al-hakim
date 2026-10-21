@@ -1,10 +1,9 @@
 import { useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
-  Clock,
   Eye,
   EyeOff,
-  History,
   Info,
   LoaderCircle,
   LockKeyhole,
@@ -14,15 +13,8 @@ import {
   TriangleAlert,
   UserRound,
 } from "lucide-react";
-import Brand from "../../components/Brand.jsx";
 import { LOGO } from "../../components/logoParts.js";
 import { adminApi } from "../services/adminApi.js";
-
-const guarantees = [
-  [LockKeyhole, "Verrouillage automatique après 5 tentatives incorrectes"],
-  [Clock, "Session fermée après 30 min d’inactivité"],
-  [History, "Chaque connexion inscrite au journal de sécurité"],
-];
 
 export default function AuthScreen({
   state,
@@ -57,43 +49,19 @@ export default function AuthScreen({
     }
   }
   return (
-    <main className="admin-auth">
-      <div className="admin-auth-story">
-        <a href="/" className="auth-story-brand">
-          <Brand light />
-        </a>
-        <div className="auth-story-body">
-          <span className="eyebrow">ESPACE ADMINISTRATION</span>
-          <h1>
-            Un centre organisé.
-            <br />
-            <em>Des ambitions qui avancent.</em>
-          </h1>
-          <p>
-            Programmes, publications, inscriptions et évaluations : tout le
-            pilotage de AL-HAKIM CENTER au même endroit.
-          </p>
-          <ul className="auth-guarantees">
-            {guarantees.map(([Icon, label]) => (
-              <li key={label}>
-                <span>
-                  <Icon size={17} />
-                </span>
-                {label}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <small>© {new Date().getFullYear()} AL-HAKIM CENTER · Djibouti</small>
-      </div>
-      <div className="admin-auth-form">
+    <main className="admin-auth admin-auth-single">
+      <div className="auth-shell">
         <form onSubmit={submit} className="auth-card">
-          <svg className="auth-logo" viewBox="89 0 192 234" aria-hidden="true">
-            <image href={LOGO} width="411" height="431" />
-          </svg>
-          <h2>
-            {setup ? "Bienvenue dans votre administration." : "Connexion administrateur"}
-          </h2>
+          <div className="auth-card-brand">
+            <svg className="auth-logo" viewBox="89 0 192 234" aria-hidden="true">
+              <image href={LOGO} width="411" height="431" />
+            </svg>
+            <span>
+              <strong>AL-HAKIM CENTER</strong>
+              Espace administration
+            </span>
+          </div>
+          <h1>{setup ? "Créer le compte administrateur" : "Connexion"}</h1>
           <p>
             {setup
               ? "Créez le premier compte administrateur. Choisissez vos propres identifiants."
@@ -223,10 +191,14 @@ export default function AuthScreen({
             <ShieldCheck size={15} />
             Accès protégé et journalisé
           </p>
-          <a href="/" className="auth-back">
-            Retour au site public
-          </a>
         </form>
+        <div className="auth-footer">
+          <a href="/">
+            <ArrowLeft size={15} />
+            Retour au site
+          </a>
+          <span>© {new Date().getFullYear()} AL-HAKIM CENTER</span>
+        </div>
       </div>
     </main>
   );

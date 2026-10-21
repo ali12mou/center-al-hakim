@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   Phone,
+  Mail,
   MapPin,
   Clock3,
   MessageCircle,
@@ -10,10 +11,12 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { sendRequest } from "../services/api.js";
+import { courseImage } from "../components/courseMedia.js";
 
 export default function Contact({
   centre,
   courses,
+  departments = [],
   registrationsAvailable,
   request,
   onPrivacy,
@@ -23,6 +26,7 @@ export default function Contact({
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const chosen = courses.find((course) => course.id === courseId);
   useEffect(() => {
     if (request) {
       setKind(request.kind);
@@ -85,6 +89,16 @@ export default function Contact({
             <span>
               <small>Appelez-nous</small>
               <strong>{centre.phone}</strong>
+            </span>
+            <ArrowUpRight size={18} />
+          </a>
+          <a className="contact-item" href={`mailto:${centre.email}`}>
+            <span className="contact-icon">
+              <Mail size={21} />
+            </span>
+            <span>
+              <small>Envoyez-nous un e-mail</small>
+              <strong>{centre.email}</strong>
             </span>
             <ArrowUpRight size={18} />
           </a>
@@ -209,13 +223,40 @@ export default function Contact({
                   name="courseId"
                 >
                   <option value="">Choisir une formation</option>
-                  {courses.map((course) => (
-                    <option value={course.id} key={course.id}>
-                      {course.title}
-                    </option>
-                  ))}
+                  {departments.length
+                    ? departments.map((department) => (
+                        <optgroup label={department.name} key={department.id}>
+                          {courses
+                            .filter((course) => course.department === department.id)
+                            .map((course) => (
+                              <option value={course.id} key={course.id}>
+                                {course.title}
+                              </option>
+                            ))}
+                        </optgroup>
+                      ))
+                    : courses.map((course) => (
+                        <option value={course.id} key={course.id}>
+                          {course.title}
+                        </option>
+                      ))}
                 </select>
               </label>
+            )}
+            {kind === "registration" && chosen && (
+              <div className="full-width chosen-course" aria-live="polite">
+                <img src={courseImage(chosen)} alt="" />
+                <span>
+                  <small>
+                    {departments.find((item) => item.id === chosen.department)
+                      ?.name || "Formation choisie"}
+                  </small>
+                  <strong>{chosen.title}</strong>
+                  <span>
+                    {chosen.level} · {chosen.format}
+                  </span>
+                </span>
+              </div>
             )}
             <label className="full-width">
               <span>Votre disponibilité</span>

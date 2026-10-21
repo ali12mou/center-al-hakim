@@ -11,6 +11,7 @@ import {
   Mail,
   Handshake,
   ShieldCheck,
+  House,
 } from "lucide-react";
 
 // `badge` renvoie au compteur correspondant de /api/admin/badges.
@@ -46,6 +47,7 @@ export const menuGroups = [
   {
     label: "Contenu du site",
     items: [
+      { path: "/admin/slides", label: "Accueil", icon: House },
       { path: "/admin/courses", label: "Courses", icon: BookOpen },
       { path: "/admin/competences", label: "Compétences", icon: GraduationCap },
       { path: "/admin/blog", label: "Blog", icon: Newspaper },
@@ -108,6 +110,34 @@ const person = [
   }),
 ];
 export const sections = {
+  slides: {
+    title: "Accueil",
+    description:
+      "Diaporama du premier bloc de la page d’accueil : image ou vidéo de fond, titre, textes et bouton. Les diapositives publiées défilent dans l’ordre choisi.",
+    publicPath: "/",
+    fields: [
+      field("eyebrow", "Surtitre", "text", {
+        hint: "Petite ligne en capitales au-dessus du titre.",
+      }),
+      common[0],
+      field("accent", "Suite du titre (en couleur)"),
+      field("description", "Description", "textarea"),
+      field("body", "Contenu complémentaire", "textarea", {
+        hint: "Une phrase courte affichée sous la description.",
+      }),
+      field("buttonLabel", "Texte du bouton"),
+      field("buttonLink", "Lien du bouton", "text", {
+        hint: "Exemples : /formations, /entreprises, /contact ou https://…",
+      }),
+      field("order", "Ordre d’affichage", "number", {
+        hint: "1 = première diapositive.",
+        default: 1,
+      }),
+      field("imageUrl", "Image de fond", "image"),
+      field("videoUrl", "Vidéo de fond (facultative)", "video"),
+      common[4],
+    ],
+  },
   competences: {
     title: "Compétences",
     description:
@@ -202,10 +232,21 @@ export const sections = {
       field("department", "Département", "select", { options: departments }),
       field("description", "Description", "textarea"),
       field("topics", "Programme (un point par ligne)", "lines"),
+      field("audience", "Public concerné", "text", {
+        hint: "Exemple : étudiants, salariés, demandeurs d’emploi.",
+      }),
+      field("prerequisites", "Prérequis", "text", {
+        hint: "Laissez vide s’il n’y en a pas.",
+      }),
       field("level", "Niveau"),
       field("duration", "Durée"),
       field("format", "Format"),
-      field("image", "Illustration", "select", { options: departments }),
+      field("imageUrl", "Image de la formation", "image"),
+      field("videoUrl", "Vidéo de présentation (facultative)", "video"),
+      field("image", "Illustration par défaut", "select", {
+        options: departments,
+        hint: "Utilisée seulement si aucune image n’est importée.",
+      }),
       field("tag", "Étiquette"),
       field("phase", "Disponibilité / phase"),
       field("featured", "Mettre en avant", "checkbox"),

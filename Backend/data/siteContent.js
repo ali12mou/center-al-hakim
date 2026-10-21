@@ -1,11 +1,11 @@
 // Le contenu éditorial des pages est centralisé ici, côté Backend.
 export const siteContent = {
   navigation: [
-    { href: "#accueil", label: "Accueil" },
-    { href: "#formations", label: "Nos formations" },
-    { href: "#centre", label: "Le centre" },
-    { href: "#entreprises", label: "Entreprises" },
-    { href: "#contact", label: "Contact" },
+    { href: "/", label: "Accueil" },
+    { href: "/formations", label: "Nos formations" },
+    { href: "/centre", label: "Le centre" },
+    { href: "/entreprises", label: "Entreprises" },
+    { href: "/contact", label: "Contact" },
   ],
   hero: {
     eyebrow: "UN NOUVEAU CHAPITRE POUR VOTRE AVENIR",
@@ -81,6 +81,23 @@ export const siteContent = {
       "Langues, management, outils numériques et finance",
     ],
     action: "Discutons de vos besoins",
+    steps: [
+      {
+        number: "01",
+        title: "Présentez votre besoin",
+        text: "Décrivez votre activité, vos équipes et les compétences à développer.",
+      },
+      {
+        number: "02",
+        title: "Recevez une proposition adaptée",
+        text: "Le centre construit avec vous le contenu, le format et le calendrier du programme.",
+      },
+      {
+        number: "03",
+        title: "Formez vos équipes",
+        text: "Ateliers pratiques, études de cas et mises en situation au service de vos objectifs.",
+      },
+    ],
   },
   faq: [
     {

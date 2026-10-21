@@ -22,7 +22,7 @@ import { sendAdminEmail } from "../controllers/email.controller.js";
 import {
   uploadImage,
   UPLOAD_TYPES,
-  MAX_UPLOAD,
+  MAX_VIDEO_UPLOAD,
 } from "../controllers/upload.controller.js";
 
 const limiter = (windowMinutes, limit, error) =>
@@ -75,7 +75,7 @@ export function createAdminRouter(isDatabaseReady) {
   router.post(
     "/uploads",
     limiter(60, 60, "Trop d’images importées. Réessayez dans une heure."),
-    express.raw({ type: UPLOAD_TYPES, limit: MAX_UPLOAD }),
+    express.raw({ type: UPLOAD_TYPES, limit: MAX_VIDEO_UPLOAD }),
     uploadImage,
   );
   return router;

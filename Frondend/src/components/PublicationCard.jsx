@@ -8,7 +8,7 @@ export function EmptyPublications({
       <BookOpen size={31} />
       <h3>Chaque nouvelle étape commence ici.</h3>
       <p>{label}</p>
-      <a href="/#contact" className="text-link">
+      <a href="/contact" className="text-link">
         Contactez le centre <ArrowUpRight size={16} />
       </a>
     </div>

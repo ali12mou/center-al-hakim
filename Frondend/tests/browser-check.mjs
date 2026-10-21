@@ -33,11 +33,12 @@ try {
     .filter({ hasText: "Comptabilité & finance" })
     .click();
   assert.equal(
-    await page.locator(".filter.active").innerText(),
+    await page.locator(".filter.active .filter-label").innerText(),
     "Comptabilité & finance",
   );
   assert.equal(await page.locator(".course-card").count(), 4);
-  await page.getByRole("button", { name: "Langues", exact: true }).click();
+  // Chaque filtre affiche aussi son nombre de formations (« Langues 4 »).
+  await page.getByRole("button", { name: /^Langues \d+$/ }).click();
   assert.equal(await page.locator(".course-card").count(), 4);
   await page.getByRole("searchbox").fill("chinois");
   assert.equal(await page.locator(".course-card").count(), 1);
@@ -73,7 +74,7 @@ try {
   const whatsapp = await page
     .getByRole("link", { name: "Continuer sur WhatsApp" })
     .getAttribute("href");
-  assert.ok(whatsapp.startsWith("https://wa.me/25377756638?text="));
+  assert.ok(whatsapp.startsWith("https://wa.me/25377701392?text="));
   assert.ok(
     decodeURIComponent(whatsapp).includes("Anglais général & professionnel"),
   );
@@ -105,6 +106,10 @@ try {
     .getByRole("navigation")
     .getByRole("link", { name: "Nos formations" })
     .click();
+  // Le menu mène à la page Nos formations, qui s’ouvre menu refermé.
+  await page.waitForURL(/\/formations$/);
+  await page.locator(".intro").waitFor({ state: "detached" });
+  await page.getByRole("button", { name: "Ouvrir le menu" }).waitFor();
   assert.equal(
     await page.getByRole("button", { name: "Ouvrir le menu" }).count(),
     1,
