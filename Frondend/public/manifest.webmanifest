@@ -1,0 +1,20 @@
+{
+  "id": "/etudiant",
+  "name": "AL-HAKIM CENTER · Espace élève",
+  "short_name": "AL-HAKIM",
+  "description": "Suivez vos cours, vos présences, vos notes et vos paiements à AL-HAKIM CENTER.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/etudiant",
+  "scope": "/etudiant",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#193964",
+  "categories": ["education"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

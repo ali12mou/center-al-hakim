@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { randomInt } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { AdminUser, AdminSession } from "../models/platform.models.js";
-import { hashPassword } from "../services/password.service.js";
+import {
+  hashPassword,
+  temporaryPassword,
+} from "../services/password.service.js";
 import { audit, clearLoginFailures } from "../services/security.service.js";
-import { passwordProblem } from "../validators/password-policy.js";
 
 // Génère un mot de passe temporaire, ferme toutes les sessions du compte et
 // impose un nouveau mot de passe à la prochaine connexion.
@@ -15,12 +16,7 @@ if (!username) {
   console.error("Usage : npm run admin:reset -- <nom_utilisateur>");
   process.exit(1);
 }
-const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-const group = () =>
-  Array.from({ length: 4 }, () => alphabet[randomInt(alphabet.length)]).join("");
-let password;
-do password = [group(), group(), group(), group()].join("-");
-while (passwordProblem(password, { username }));
+const password = temporaryPassword(username);
 
 try {
   await mongoose.connect(

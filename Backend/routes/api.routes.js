@@ -9,6 +9,8 @@ import {
   getStaticPortal,
 } from "../services/platform.service.js";
 import { submitAssessment } from "../controllers/assessment.controller.js";
+import { SiteVisit } from "../models/system.models.js";
+import { today } from "../services/dates.js";
 
 export function createApiRouter(dependencies) {
   const router = Router();
@@ -46,6 +48,29 @@ export function createApiRouter(dependencies) {
   router.get("/courses", courses.list);
   router.get("/courses/:id", courses.detail);
   router.post("/requests", requestLimit, createRequest);
+  // Fréquentation : une vue par page affichée, une visite par session de
+  // navigateur. Aucune adresse IP ni cookie n’est conservé.
+  router.post(
+    "/visits",
+    rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false }),
+    async (req, res) => {
+      const path = typeof req.body?.path === "string" ? req.body.path : "";
+      if (!dependencies.isDatabaseReady() || !/^\/[\w\-/.]{0,119}$/.test(path) || path.startsWith("/admin"))
+        return res.status(204).end();
+      const day = today();
+      try {
+        await SiteVisit.updateOne(
+          { _id: `${day}|${path}` },
+          {
+            $setOnInsert: { day, path },
+            $inc: { views: 1, sessions: req.body.newSession === true ? 1 : 0 },
+          },
+          { upsert: true },
+        );
+      } catch {}
+      res.status(204).end();
+    },
+  );
   router.post("/assessments/:id/attempts", requestLimit, submitAssessment);
   router.use("/admin", (_req, _res, next) => next("router"));
   router.use((_req, res) =>

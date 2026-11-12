@@ -12,7 +12,8 @@ const publishFields = {
 const personFields = {
   reference: { ...text, required: true, unique: true },
   name: { ...text, required: true, maxlength: 100 },
-  email: { ...text, required: true, maxlength: 254 },
+  // Exigé par les formulaires du site ; facultatif pour un student saisi au bureau.
+  email: { ...text, maxlength: 254, default: "" },
   phone: { ...text, required: true, maxlength: 30 },
   courseId: { ...text, default: "" },
   schedule: {
@@ -35,7 +36,14 @@ const userSchema = new mongoose.Schema(
     username: { ...text, required: true, unique: true, lowercase: true },
     email: { ...text, required: true, lowercase: true },
     passwordHash: { type: String, required: true, select: false },
-    role: { type: String, enum: ["admin"], default: "admin" },
+    // admin : administrateur général (tous les droits, gestion des comptes).
+    // staff : utilisateur limité aux permissions « section:action » cochées.
+    role: { type: String, enum: ["admin", "staff"], default: "admin" },
+    permissions: { type: [String], default: [] },
+    active: { type: Boolean, default: true },
+    jobTitle: { ...text, maxlength: 100, default: "" },
+    phone: { ...text, maxlength: 30, default: "" },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "AdminUser" },
     bootstrap: { type: Boolean, default: false },
     // Un mot de passe temporaire (script de réinitialisation) doit être remplacé.
     mustChangePassword: { type: Boolean, default: false },
@@ -77,6 +85,24 @@ const loginThrottleSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true, index: { expires: 0 } },
 });
 
+// Code de vérification à 6 chiffres envoyé par e-mail après le mot de passe.
+// Le défi (jeton aléatoire) et le code sont stockés hachés ; MongoDB efface
+// les défis expirés.
+const otpSchema = new mongoose.Schema({
+  challengeHash: { type: String, required: true, unique: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AdminUser",
+    required: true,
+    index: true,
+  },
+  codeHash: { type: String, required: true },
+  attempts: { type: Number, default: 0 },
+  resends: { type: Number, default: 0 },
+  sentAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date, required: true, index: { expires: 0 } },
+});
+
 export const auditEvents = [
   "setup",
   "login_success",
@@ -87,11 +113,23 @@ export const auditEvents = [
   "password_change_failed",
   "password_reset",
   "sessions_revoked",
+  "login_disabled",
+  "user_created",
+  "user_updated",
+  "user_disabled",
+  "user_enabled",
+  "user_deleted",
+  "user_password_reset",
+  "session_revoked",
+  "otp_sent",
+  "otp_failure",
 ];
 const auditSchema = new mongoose.Schema({
   event: { type: String, enum: auditEvents, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "AdminUser" },
   username: { ...text, default: "" },
+  // Compte concerné quand l’administrateur général agit sur un autre compte.
+  target: { ...text, default: "" },
   ip: { ...text, default: "" },
   userAgent: { ...text, default: "" },
   // Le journal de sécurité est conservé 180 jours.
@@ -105,6 +143,11 @@ const registrationSchema = new mongoose.Schema(
     username: { ...text, lowercase: true, maxlength: 50, default: "" },
     passwordHash: { type: String, select: false, default: "" },
     hasPassword: { type: Boolean, default: false },
+    // Fiche student saisie par l’administration (Finances › Liste des students).
+    // Un inscrit n’apparaît dans la liste des students qu’une fois ajouté.
+    isStudent: { type: Boolean, default: false, index: true },
+    photoUrl: { ...text, default: "" },
+    enrolledOn: { ...text, match: /^\d{4}-\d{2}-\d{2}$/, default: undefined },
     profile: {
       type: String,
       enum: ["apprenant", "professionnel", "entreprise"],
@@ -230,6 +273,7 @@ export const AdminSession = mongoose.model(
   sessionSchema,
   "admin_sessions",
 );
+export const AdminOtp = mongoose.model("AdminOtp", otpSchema, "admin_otps");
 export const LoginThrottle = mongoose.model(
   "LoginThrottle",
   loginThrottleSchema,
@@ -280,6 +324,7 @@ export const PlatformSetting = mongoose.model(
 export const platformModels = [
   AdminUser,
   AdminSession,
+  AdminOtp,
   LoginThrottle,
   AdminAudit,
   Registration,

@@ -1,3 +1,5 @@
+// Les tests se connectent sans code e-mail (option ignorée en production).
+process.env.ADMIN_OTP ??= "off";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";

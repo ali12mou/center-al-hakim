@@ -30,7 +30,7 @@ export default function AccountMenu({ user, onLogout }) {
         <span className="admin-avatar">{initials(user.name)}</span>
         <span className="account-name">
           <strong>{user.name}</strong>
-          <small>Administrateur</small>
+          <small>{user.role === "admin" ? "Administrateur général" : user.jobTitle || "Utilisateur"}</small>
         </span>
         <ChevronDown size={16} />
       </button>

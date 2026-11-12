@@ -1,11 +1,13 @@
 import { KeyRound } from "lucide-react";
 import PasswordForm from "./PasswordForm.jsx";
+import ThemeToggle from "../../components/ThemeToggle.jsx";
 
 // Affiché tant que le compte utilise un mot de passe temporaire (le Backend bloque le reste).
 export default function PasswordChangeScreen({ user, onChanged, onLogout }) {
   return (
     <main className="admin-auth admin-auth-single">
       <div className="auth-card">
+        <div className="auth-display-preferences"><ThemeToggle showLabel /></div>
         <span className="auth-emblem">
           <KeyRound size={28} />
         </span>

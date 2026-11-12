@@ -51,12 +51,13 @@ export const clientIp = (req) =>
 export const clientAgent = (req) => (req.get("user-agent") || "").slice(0, 200);
 
 // Le journal ne doit jamais bloquer une connexion : une erreur est seulement signalée.
-export async function audit(event, req, { user, username = "" } = {}) {
+export async function audit(event, req, { user, username = "", target = "" } = {}) {
   try {
     await AdminAudit.create({
       event,
       userId: user?._id,
       username: (user?.username || username).slice(0, 50),
+      target: target.slice(0, 50),
       ip: req ? clientIp(req) : "",
       userAgent: req ? clientAgent(req) : "",
     });

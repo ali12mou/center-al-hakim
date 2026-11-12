@@ -68,3 +68,46 @@ export async function uploadImage(req, res, next) {
     next(error);
   }
 }
+
+// Documents RH et justificatifs financiers : jamais servis par /uploads (public),
+// seulement par l’API, à un compte connecté ayant accès aux RH ou aux finances.
+export const PRIVATE_DIR = fileURLToPath(new URL("../private-files/", import.meta.url));
+export const FILE_TYPES = [...IMAGE_TYPES, "application/pdf"];
+const isPdf = (buffer) =>
+  Buffer.isBuffer(buffer) && buffer.length > 8 && buffer.toString("ascii", 0, 5) === "%PDF-";
+export const documentExtension = (buffer) =>
+  isPdf(buffer) ? "pdf" : imageExtension(buffer);
+const FILE_NAME = /^[0-9a-f-]{36}\.(pdf|png|jpg|gif|webp)$/;
+
+export async function uploadPrivateFile(req, res, next) {
+  try {
+    const extension = documentExtension(req.body);
+    if (!extension)
+      return res.status(415).json({
+        error: "Format non accepté. Utilisez un PDF ou une image PNG, JPG, WebP ou GIF.",
+      });
+    if (req.body.length > MAX_UPLOAD)
+      return res.status(413).json({ error: "Fichier trop lourd : 10 Mo maximum." });
+    await mkdir(PRIVATE_DIR, { recursive: true });
+    const name = `${randomUUID()}.${extension}`;
+    await writeFile(path.join(PRIVATE_DIR, name), req.body, { flag: "wx" });
+    res.status(201).json({ url: `/api/admin/files/${name}`, size: req.body.length });
+  } catch (error) {
+    next(error);
+  }
+}
+export function sendPrivateFile(req, res) {
+  if (!FILE_NAME.test(req.params.name))
+    return res.status(404).json({ error: "Document introuvable." });
+  const pdf = req.params.name.endsWith(".pdf");
+  res.set({
+    "Content-Security-Policy": "default-src 'none'; sandbox",
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "private, no-store",
+    // Un PDF est téléchargé (la visionneuse du navigateur refuse le mode « sandbox »).
+    "Content-Disposition": pdf ? `attachment; filename="document-${req.params.name}"` : "inline",
+  });
+  res.sendFile(req.params.name, { root: PRIVATE_DIR, dotfiles: "deny" }, (error) => {
+    if (error && !res.headersSent) res.status(404).json({ error: "Document introuvable." });
+  });
+}

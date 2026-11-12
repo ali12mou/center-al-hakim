@@ -1,11 +1,16 @@
 import {
+  Ban,
   CircleCheck,
   KeyRound,
   LogIn,
   LogOut,
+  Mail,
   ShieldAlert,
   ShieldCheck,
+  Trash2,
   TriangleAlert,
+  UserCog,
+  UserPlus,
 } from "lucide-react";
 import { dateTimeLabel } from "../config/sections.js";
 
@@ -20,7 +25,20 @@ const events = {
   password_change_failed: [TriangleAlert, "Changement de mot de passe refusé", "warning"],
   password_reset: [KeyRound, "Mot de passe réinitialisé (serveur)", "warning"],
   sessions_revoked: [CircleCheck, "Autres sessions fermées", "neutral"],
+  login_disabled: [Ban, "Connexion refusée (compte désactivé)", "warning"],
+  user_created: [UserPlus, "Compte créé", "good"],
+  user_updated: [UserCog, "Droits ou profil modifiés", "neutral"],
+  user_disabled: [Ban, "Compte désactivé", "warning"],
+  user_enabled: [CircleCheck, "Compte réactivé", "good"],
+  user_deleted: [Trash2, "Compte supprimé", "critical"],
+  user_password_reset: [KeyRound, "Mot de passe temporaire généré", "warning"],
+  session_revoked: [LogOut, "Session fermée par l’administrateur", "neutral"],
+  otp_sent: [Mail, "Code de vérification envoyé", "neutral"],
+  otp_failure: [TriangleAlert, "Code de vérification incorrect", "warning"],
 };
+export const eventLabels = Object.fromEntries(
+  Object.entries(events).map(([key, [, label]]) => [key, label]),
+);
 
 export default function SecurityEvents({ items, limit }) {
   if (!items) return <p className="dashboard-zero">Chargement du journal…</p>;
@@ -42,7 +60,7 @@ export default function SecurityEvents({ items, limit }) {
             <span>
               <strong>{label}</strong>
               <small>
-                {[item.username && `@${item.username}`, item.device, item.ip]
+                {[item.username && `@${item.username}`, item.target && `→ @${item.target}`, item.device, item.ip]
                   .filter(Boolean)
                   .join(" · ")}
               </small>

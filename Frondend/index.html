@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#193964" />
+    <script src="/theme-init.js"></script>
+    <script src="/pwa-init.js"></script>
     <meta name="description" content="AL-HAKIM CENTER à Djibouti : découvrez nos programmes de langues, management, informatique, comptabilité et finance. Apprenez aujourd’hui, préparez demain." />
     <link rel="icon" type="image/svg+xml" href="/faviconn.svg" />
     <link rel="preload" as="image" href="/Untitled-2.png" />
@@ -23,6 +25,9 @@
         width: 110px;
         height: auto;
         animation: boot-breathe 1.6s ease-in-out infinite;
+      }
+      html[data-theme="dark"] #boot-splash {
+        background: radial-gradient(circle at 50% 42%, #152338, #0d1728);
       }
       #boot-splash span {
         width: 140px;

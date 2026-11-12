@@ -70,3 +70,19 @@ export async function sendRequest(data) {
     throw new Error(result.error || "Votre demande n’a pas pu être envoyée.");
   return result;
 }
+
+// Fréquentation anonyme : une vue par page, une visite par session de
+// navigateur. Aucun cookie, aucune donnée personnelle ; une erreur est ignorée.
+export function recordVisit(path) {
+  let newSession = false;
+  try {
+    newSession = !sessionStorage.getItem("ah-visit");
+    sessionStorage.setItem("ah-visit", "1");
+  } catch {}
+  fetch(`${baseUrl}/api/visits`, {
+    method: "POST",
+    keepalive: true,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path, newSession }),
+  }).catch(() => {});
+}

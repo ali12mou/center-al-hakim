@@ -44,7 +44,7 @@
   border-radius: 9px;
   font-size: 14px;
   font-weight: 600;
-  background: white;
+  background: var(--a-surface, white);
   color: var(--a-ink-2);
 }
 .admin-section-tabs button.active {
@@ -366,11 +366,11 @@
   border-radius: 10px;
   border: 1px solid var(--a-border);
   color: var(--a-ink-2);
-  background: white;
+  background: var(--a-surface, white);
 }
 .admin-icon-link:hover {
   background: var(--a-blue-soft);
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .account-menu {
   position: relative;
@@ -414,7 +414,7 @@
   top: calc(100% + 8px);
   width: 240px;
   padding: 6px;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-radius: 12px;
   box-shadow: 0 12px 32px #0f224024;
@@ -470,7 +470,7 @@
 }
 .admin-kicker {
   font-size: 12.5px;
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
   letter-spacing: 0.1em;
   font-weight: 700;
   text-transform: uppercase;
@@ -521,7 +521,7 @@
   flex-direction: column;
   min-height: 148px;
   padding: 20px;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-radius: var(--a-radius);
   box-shadow: var(--a-shadow);
@@ -534,7 +534,7 @@
 a.admin-stat:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px #0f22401a;
-  border-color: #d3dbe7;
+  border-color: var(--a-border, #d3dbe7);
 }
 .stat-top {
   display: flex;
@@ -552,16 +552,16 @@ a.admin-stat:hover {
   height: 36px;
   border-radius: 10px;
   background: var(--a-blue-soft);
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
   flex-shrink: 0;
 }
 .tone-pink .stat-icon {
   background: var(--a-pink-soft);
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 .tone-blue .stat-icon {
-  background: #e6f3fb;
-  color: #1f6aa5;
+  background: var(--tone-blue-bg, #e6f3fb);
+  color: var(--tone-blue-ink, #1f6aa5);
 }
 .tone-green .stat-icon {
   background: var(--a-green-soft);
@@ -626,7 +626,7 @@ a.admin-stat:hover {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-radius: var(--a-radius);
   box-shadow: var(--a-shadow);
@@ -663,15 +663,15 @@ a.admin-stat:hover {
   gap: 6px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
   white-space: nowrap;
 }
 .panel-heading > a:hover {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 .panel-action {
   border: 1px solid var(--a-border);
-  background: white;
+  background: var(--a-surface, white);
   border-radius: 8px;
   padding: 7px 12px;
   font-size: 13px;
@@ -682,7 +682,7 @@ a.admin-stat:hover {
 .panel-action:hover:not(:disabled) {
   background: var(--a-red-soft);
   color: var(--a-red);
-  border-color: #f3c9d4;
+  border-color: var(--a-border, #f3c9d4);
 }
 .panel-action:disabled {
   opacity: 0.5;
@@ -700,7 +700,7 @@ a.admin-stat:hover {
   font-size: 13px;
   color: var(--a-muted);
   border-top: 1px solid var(--a-line);
-  background: #fafbfd;
+  background: var(--a-surface-soft, #fafbfd);
 }
 .panel-note svg {
   flex-shrink: 0;
@@ -714,11 +714,11 @@ a.admin-stat:hover {
   border-top: 1px solid var(--a-line);
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .panel-footer-link:hover {
-  background: #fafbfd;
-  color: var(--a-pink);
+  background: var(--a-surface-soft, #fafbfd);
+  color: var(--a-accent, var(--a-pink));
 }
 .dashboard-zero {
   display: grid;
@@ -755,7 +755,7 @@ a.admin-stat:hover {
 }
 .course-bars > div > div {
   height: 8px;
-  background: #eef2f7;
+  background: var(--a-surface-soft, #eef2f7);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -911,7 +911,7 @@ a.admin-stat:hover {
   height: 34px;
   font-size: 12px;
   background: var(--a-blue-soft);
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .security-event-icon {
   display: grid;
@@ -919,7 +919,7 @@ a.admin-stat:hover {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: #eef2f7;
+  background: var(--a-surface-soft, #eef2f7);
   color: var(--a-ink-2);
   flex-shrink: 0;
 }
@@ -954,7 +954,7 @@ a.admin-stat:hover {
 .security-summary span {
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f6f8fb;
+  background: var(--a-surface-soft, #f6f8fb);
   font-size: 13px;
   color: var(--a-muted);
 }
@@ -970,7 +970,7 @@ a.admin-stat:hover {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: white;
+  background: var(--a-surface, white);
   padding: 16px 20px;
   border: 1px solid var(--a-border);
   border-radius: var(--a-radius) var(--a-radius) 0 0;
@@ -1000,12 +1000,12 @@ a.admin-stat:hover {
   min-width: 200px;
   max-width: 280px;
   color: var(--a-muted);
-  background: #fbfcfe;
+  background: var(--a-surface-soft, #fbfcfe);
 }
 .admin-search:focus-within {
   border-color: var(--a-navy);
   box-shadow: 0 0 0 3px #1939641a;
-  background: white;
+  background: var(--a-surface, white);
 }
 .admin-search input {
   border: 0;
@@ -1022,10 +1022,10 @@ a.admin-stat:hover {
   border-radius: 10px;
   max-width: 250px;
   color: var(--a-ink-2);
-  background: white;
+  background: var(--a-surface, white);
 }
 .admin-table-panel {
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-top: 0;
   border-radius: 0 0 var(--a-radius) var(--a-radius);
@@ -1049,7 +1049,7 @@ a.admin-stat:hover {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--a-muted);
-  background: #f8fafc;
+  background: var(--a-surface-soft, #f8fafc);
   border-bottom: 1px solid var(--a-line);
   white-space: nowrap;
 }
@@ -1067,7 +1067,7 @@ a.admin-stat:hover {
   border-bottom: 0;
 }
 .admin-table tbody tr:hover {
-  background: #f8fafd;
+  background: var(--a-surface-soft, #f8fafd);
 }
 .admin-person-table {
   min-width: 1350px;
@@ -1076,12 +1076,12 @@ a.admin-stat:hover {
 .admin-person-table td:last-child {
   position: sticky;
   right: 0;
-  background: #fff;
+  background: var(--a-surface, #fff);
   box-shadow: -5px 0 12px #243e5b08;
   min-width: 160px;
 }
 .admin-person-table th:last-child {
-  background: #f8fafc;
+  background: var(--a-surface-soft, #f8fafc);
 }
 .admin-person-table td {
   white-space: nowrap;
@@ -1103,7 +1103,7 @@ a.admin-stat:hover {
   font-size: 12px;
   font-weight: 700;
   font-style: normal;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
   background: var(--a-blue-soft);
   width: 32px;
   height: 32px;
@@ -1168,12 +1168,12 @@ a.admin-stat:hover {
   background: currentColor;
 }
 .status-new {
-  color: #8a5300;
+  color: var(--tone-amber-ink, #8a5300);
   background: var(--a-amber-soft);
 }
 .status-contacted {
-  color: #1f5f9e;
-  background: #e7f0fb;
+  color: var(--tone-blue-ink, #1f5f9e);
+  background: var(--tone-blue-bg, #e7f0fb);
 }
 .status-confirmed {
   color: var(--a-green);
@@ -1181,7 +1181,7 @@ a.admin-stat:hover {
 }
 .status-closed {
   color: #55657b;
-  background: #eef1f5;
+  background: var(--a-surface-soft, #eef1f5);
 }
 .admin-actions {
   display: flex;
@@ -1192,7 +1192,7 @@ a.admin-stat:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   padding: 7px;
   border-radius: 8px;
@@ -1203,7 +1203,7 @@ a.admin-stat:hover {
 }
 .admin-actions button:hover {
   background: var(--a-blue-soft);
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .admin-actions .action-whatsapp:hover {
   background: var(--a-green-soft);
@@ -1245,7 +1245,7 @@ a.admin-stat:hover {
 }
 .admin-table-footer button {
   display: flex;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-radius: 8px;
   padding: 6px;
@@ -1291,7 +1291,7 @@ a.admin-stat:hover {
   font-weight: 600;
 }
 .admin-form label em {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
   font-style: normal;
   display: none;
 }
@@ -1305,7 +1305,7 @@ a.admin-stat:hover {
   font-weight: 400;
   color: var(--a-ink);
   width: 100%;
-  background: white;
+  background: var(--a-surface, white);
   min-width: 0;
 }
 .admin-form input:focus,
@@ -1334,14 +1334,14 @@ a.admin-stat:hover {
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  background: #f4f7fb;
+  background: var(--a-surface-soft, #f4f7fb);
   padding: 14px;
   border-radius: 10px;
 }
 .admin-form .admin-checkbox input {
   width: 16px;
   height: 16px;
-  accent-color: var(--a-navy);
+  accent-color: var(--a-heading, var(--a-navy));
 }
 .admin-editor-actions {
   display: flex;
@@ -1358,16 +1358,16 @@ a.admin-stat:hover {
 }
 .admin-error {
   padding: 12px 14px;
-  border: 1px solid #f3cdd7;
+  border: 1px solid var(--a-border, #f3cdd7);
   border-radius: 10px;
-  background: #fff4f6;
+  background: var(--tone-red-bg, #fff4f6);
   color: var(--a-red);
   font-size: 14px;
   line-height: 1.6;
 }
 .admin-success {
   padding: 12px 14px;
-  border: 1px solid #bfe5cf;
+  border: 1px solid var(--a-border, #bfe5cf);
   border-radius: 10px;
   background: var(--a-green-soft);
   color: var(--a-green);
@@ -1399,7 +1399,7 @@ a.admin-stat:hover {
 .composer-recipient {
   padding: 14px 18px;
   border-radius: 10px;
-  background: #f5f8fc;
+  background: var(--a-surface-soft, #f5f8fc);
   font-size: 14px;
 }
 .composer-actions {
@@ -1437,7 +1437,7 @@ a.admin-stat:hover {
   gap: 18px;
 }
 .questions-editor legend {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
   font-size: 14px;
   padding: 0 7px;
 }
@@ -1486,7 +1486,7 @@ a.admin-stat:hover {
   font-size: 15px;
   border: 1px solid var(--a-border);
   border-radius: 10px;
-  background: white;
+  background: var(--a-surface, white);
   color: var(--a-ink);
 }
 .password-form input:focus {
@@ -1515,8 +1515,8 @@ a.admin-stat:hover {
   color: var(--a-muted);
 }
 .password-input button:hover {
-  background: #eef2f7;
-  color: var(--a-navy);
+  background: var(--a-surface-soft, #eef2f7);
+  color: var(--a-heading, var(--a-navy));
 }
 .password-meter {
   display: flex;
@@ -1535,7 +1535,7 @@ a.admin-stat:hover {
 .password-meter i {
   height: 5px;
   border-radius: 3px;
-  background: #e6ebf2;
+  background: var(--a-surface-soft, #e6ebf2);
   transition: background 0.2s;
 }
 .password-meter[data-score="1"] i.on,
@@ -1555,7 +1555,7 @@ a.admin-stat:hover {
   padding: 12px 14px;
   display: grid;
   gap: 6px;
-  background: #f7f9fc;
+  background: var(--a-surface-soft, #f7f9fc);
   border-radius: 10px;
   font-size: 13px;
   color: var(--a-muted);
@@ -1590,14 +1590,14 @@ a.admin-stat:hover {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   min-height: 100vh;
-  background: #f6f8fb;
+  background: var(--a-surface-soft, #f6f8fb);
   color: var(--a-ink);
 }
 .auth-card {
   width: 100%;
   max-width: 420px;
   padding: 34px 34px 26px;
-  background: white;
+  background: var(--a-surface, white);
   border: 1px solid var(--a-border);
   border-radius: 18px;
   box-shadow:
@@ -1662,9 +1662,9 @@ a.admin-stat:hover {
   width: 100%;
   padding: 13px 14px 13px 44px;
   font-size: 15px;
-  border: 1px solid #dbe2ec;
+  border: 1px solid var(--a-border, #dbe2ec);
   border-radius: 10px;
-  background: #fbfcfe;
+  background: var(--a-surface-soft, #fbfcfe);
   color: var(--a-ink);
   transition:
     border-color 0.15s,
@@ -1681,11 +1681,11 @@ a.admin-stat:hover {
 .auth-input input:focus {
   outline: none;
   border-color: var(--a-navy);
-  background: white;
+  background: var(--a-surface, white);
   box-shadow: 0 0 0 4px #1939641a;
 }
 .auth-input:focus-within > svg:first-child {
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .auth-caps {
   display: flex;
@@ -1713,7 +1713,7 @@ a.admin-stat:hover {
   padding: 12px 14px;
   border-radius: 10px;
   background: var(--a-blue-soft);
-  color: #1f4f86;
+  color: var(--tone-blue-ink, #1f4f86);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -1753,10 +1753,10 @@ a.admin-stat:hover {
   text-align: center;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .auth-back:hover {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 .auth-emblem {
   display: grid;
@@ -1765,7 +1765,7 @@ a.admin-stat:hover {
   height: 56px;
   border-radius: 14px;
   background: var(--a-pink-soft);
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
   margin-bottom: 20px;
 }
 .admin-auth-single {
@@ -1806,7 +1806,7 @@ a.admin-stat:hover {
 .auth-card-brand strong {
   font-size: 15px;
   letter-spacing: 0.2px;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .auth-footer {
   display: flex;
@@ -1823,10 +1823,10 @@ a.admin-stat:hover {
   align-items: center;
   gap: 6px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .auth-footer a:hover {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 .spin {
   animation: admin-spin 0.9s linear infinite;
@@ -2052,7 +2052,7 @@ a.admin-stat:hover {
   position: relative;
   border: 1.5px dashed #c9d3e1;
   border-radius: 12px;
-  background: #f8fafd;
+  background: var(--a-surface-soft, #f8fafd);
   overflow: hidden;
   transition:
     border-color 0.15s,
@@ -2065,7 +2065,7 @@ a.admin-stat:hover {
 .image-drop.has-image {
   border-style: solid;
   border-color: var(--a-border);
-  background: #f1f4f9;
+  background: var(--a-surface-soft, #f1f4f9);
 }
 .image-drop-empty {
   display: grid;
@@ -2079,7 +2079,7 @@ a.admin-stat:hover {
   text-align: center;
 }
 .image-drop-empty svg {
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .image-drop-empty strong {
   font-size: 14.5px;
@@ -2089,7 +2089,7 @@ a.admin-stat:hover {
   font-size: 12.5px;
 }
 .image-drop-empty:hover strong {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 .image-drop img,
 .image-drop video {
@@ -2127,8 +2127,8 @@ a.admin-stat:hover {
   color: var(--a-ink-2);
 }
 .image-drop-actions button:hover {
-  background: white;
-  color: var(--a-navy);
+  background: var(--a-surface, white);
+  color: var(--a-heading, var(--a-navy));
 }
 .image-drop-actions button:last-child:hover {
   color: var(--a-red);
@@ -2139,7 +2139,7 @@ a.admin-stat:hover {
   display: grid;
   place-items: center;
   background: #ffffffb3;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .image-field-error {
   font-size: 13px;
@@ -2155,10 +2155,10 @@ a.admin-stat:hover {
   background: none;
   font-size: 13px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .image-url-toggle:hover {
-  color: var(--a-pink);
+  color: var(--a-accent, var(--a-pink));
 }
 
 .auth-retry {
@@ -2209,10 +2209,10 @@ a.admin-stat:hover {
   padding: 20px 20px 22px;
   border: 1px solid var(--a-border);
   border-radius: 14px;
-  background: white;
+  background: var(--a-surface, white);
 }
 .editor-side .editor-section {
-  background: #fbfcfe;
+  background: var(--a-surface-soft, #fbfcfe);
 }
 .editor-section > header {
   margin-bottom: 18px;
@@ -2268,7 +2268,7 @@ a.admin-stat:hover {
   background: var(--a-blue-soft);
   font-size: 12px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
 }
 .editor-label {
   display: inline-flex;
@@ -2290,7 +2290,7 @@ a.admin-stat:hover {
   padding: 13px 14px;
   border: 1px solid var(--a-border);
   border-radius: 12px;
-  background: white;
+  background: var(--a-surface, white);
   cursor: pointer;
 }
 .admin-switch input {
@@ -2306,7 +2306,7 @@ a.admin-stat:hover {
   height: 22px;
   margin-top: 1px;
   border-radius: 22px;
-  background: #cfd8e5;
+  background: var(--a-surface-soft, #cfd8e5);
   transition: background 0.2s;
 }
 .admin-switch-track::after {
@@ -2317,7 +2317,7 @@ a.admin-stat:hover {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: white;
+  background: var(--a-surface, white);
   box-shadow: 0 1px 3px #0f224040;
   transition: transform 0.2s;
 }
@@ -2401,7 +2401,7 @@ a.admin-stat:hover {
   max-height: 260px;
   border: 1px solid var(--a-border);
   border-radius: 10px;
-  background: #f1f4f9;
+  background: var(--a-surface-soft, #f1f4f9);
   object-fit: contain;
 }
 video.record-media {
@@ -2415,10 +2415,10 @@ video.record-media {
   padding: 13px 18px;
   border: 1.5px dashed #c9d3e1;
   border-radius: 12px;
-  background: #f8fafd;
+  background: var(--a-surface-soft, #f8fafd);
   font-size: 14px;
   font-weight: 600;
-  color: var(--a-navy);
+  color: var(--a-heading, var(--a-navy));
   cursor: pointer;
 }
 .record-media-empty:hover {

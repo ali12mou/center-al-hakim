@@ -3,8 +3,12 @@ import mongoose from "mongoose";
 import { createApp } from "./app.js";
 import { fileURLToPath } from "node:url";
 import { platformModels } from "./models/platform.models.js";
+import { hrModels } from "./models/hr.models.js";
+import { financeModels } from "./models/finance.models.js";
+import { systemModels } from "./models/system.models.js";
 import { Course, Request } from "./models/index.js";
 import { seedPlatform } from "./services/platform.service.js";
+import { seedFinance } from "./services/finance.service.js";
 
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
 
@@ -27,9 +31,12 @@ if (process.env.MONGODB_URI) {
       serverSelectionTimeoutMS: 5000,
     });
     await Promise.all(
-      [...platformModels, Course, Request].map((model) => model.init()),
+      [...platformModels, ...hrModels, ...financeModels, ...systemModels, Course, Request].map(
+        (model) => model.init(),
+      ),
     );
     await seedPlatform();
+    await seedFinance();
     console.log(
       "MongoDB connecté. Les demandes de préinscription sont disponibles.",
     );

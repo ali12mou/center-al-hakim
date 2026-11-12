@@ -3,11 +3,13 @@ import { Link, NavLink } from "react-router-dom";
 import { MapPin, Phone, Mail, ArrowUpRight, Menu, X, ShieldCheck } from "lucide-react";
 import Brand from "./Brand.jsx";
 import { useLanguage } from '../context/LanguageContext.jsx';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 
 // Chaque entrée du menu est une page : l’onglet actif suit l’adresse affichée.
 export default function Header({ centre, navigation }) {
   const [open, setOpen] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   return (
     <>
       <div className="topbar">
@@ -21,10 +23,10 @@ export default function Header({ centre, navigation }) {
           <a href={`mailto:${centre.email}`} className="topbar-email" dir="ltr" aria-label={centre.email} title={centre.email}>
             <Mail size={13} /> <span>{centre.email}</span>
           </a>
-          <a href="/admin/login" className="admin-access" aria-label="Accès administrateur" title="Accès administrateur">
+          <a href="/admin/login" className="admin-access" aria-label={t('Accès administrateur')} title={t('Accès administrateur')}>
             <ShieldCheck size={16} /> <span>{t('Administration')}</span>
           </a>
-          <div className="language-switch" role="group" aria-label="Langue du site">{[['fr', 'Français'], ['en', 'English'], ['ar', 'العربية']].map(([code, label]) => <button type="button" key={code} aria-label={label} aria-pressed={language === code} className={language === code ? 'selected' : ''} onClick={() => setLanguage(code)}>{code.toUpperCase()}</button>)}</div></div>
+          <div className="display-preferences"><LanguageSwitcher /><ThemeToggle /></div></div>
         </div>
       </div>
       <header className="header">
@@ -60,7 +62,7 @@ export default function Header({ centre, navigation }) {
             className="mobile-menu icon-button"
             type="button"
             onClick={() => setOpen(!open)}
-            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-label={t(open ? 'Fermer le menu' : 'Ouvrir le menu')}
             aria-expanded={open}
           >
             {open ? <X /> : <Menu />}

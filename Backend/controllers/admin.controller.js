@@ -9,6 +9,10 @@ import { Course } from "../models/index.js";
 import { resourceModels } from "../services/platform.service.js";
 import { contentSchemas, personSchema } from "../validators/admin.validator.js";
 import { hashPassword } from "../services/password.service.js";
+import { can } from "../config/permissions.js";
+import { Leave, Attendance, PayAdjustment } from "../models/hr.models.js";
+import { Expense, StaffPayment } from "../models/finance.models.js";
+import { today } from "../services/dates.js";
 
 const allModels = {
   ...resourceModels,
@@ -123,13 +127,49 @@ export async function dashboard(req, res, next) {
     next(error);
   }
 }
+// Compteurs « à traiter » du menu, limités à ce que le compte peut voir.
 export async function badges(req, res, next) {
   try {
-    const [contacts, registrations] = await Promise.all([
-      Contact.countDocuments({ status: "new" }),
-      Registration.countDocuments({ status: "new" }),
-    ]);
-    res.json({ contacts, registrations });
+    const user = req.admin;
+    const tasks = {
+      contacts: [can(user, "centre.contacts"), () => Contact.countDocuments({ status: "new" })],
+      registrations: [
+        can(user, "centre.registrations"),
+        () => Registration.countDocuments({ status: "new" }),
+      ],
+      leaves: [can(user, "rh.leaves", "approve"), () => Leave.countDocuments({ status: "pending" })],
+      attendance: [
+        can(user, "rh.attendance", "approve"),
+        () => Attendance.countDocuments({ validated: false, date: { $lte: today() } }),
+      ],
+      adjustments: [
+        can(user, "rh.adjustments", "approve"),
+        () => PayAdjustment.countDocuments({ status: "pending" }),
+      ],
+      expenses: [
+        can(user, "finance.expenses", "approve"),
+        () => Expense.countDocuments({ status: "pending" }),
+      ],
+      staffPayments: [
+        can(user, "finance.staffPayments", "approve"),
+        () => StaffPayment.countDocuments({ status: "pending" }),
+      ],
+      advances: [
+        can(user, "finance.advances", "approve"),
+        () =>
+          PayAdjustment.countDocuments({
+            type: "advance",
+            status: "approved",
+            "disbursed.paid": { $ne: true },
+          }),
+      ],
+    };
+    const entries = await Promise.all(
+      Object.entries(tasks)
+        .filter(([, [allowed]]) => allowed)
+        .map(async ([key, [, count]]) => [key, await count()]),
+    );
+    res.json(Object.fromEntries(entries));
   } catch (error) {
     next(error);
   }

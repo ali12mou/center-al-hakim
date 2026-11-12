@@ -18,6 +18,7 @@ import {
 import MonthlyChart from "../components/MonthlyChart.jsx";
 import SecurityEvents from "../components/SecurityEvents.jsx";
 import { adminApi } from "../services/adminApi.js";
+import { useAdmin } from "../context/AdminContext.jsx";
 import {
   dateLabel,
   dateTimeLabel,
@@ -65,6 +66,7 @@ function Trend({ current, previous }) {
 }
 
 export default function DashboardPage({ user }) {
+  const admin = useAdmin();
   const [data, setData] = useState(null);
   const [security, setSecurity] = useState(null);
   const [error, setError] = useState("");
@@ -94,17 +96,19 @@ export default function DashboardPage({ user }) {
             {date.charAt(0).toUpperCase() + date.slice(1)}
           </span>
           <h1>Bonjour {user.name.split(" ")[0]}.</h1>
-          <p>Voici l’activité de AL-HAKIM CENTER.</p>
+          <p>Voici l’activité du centre : inscriptions, contacts, formations et évaluations.</p>
         </div>
         <div className="admin-heading-actions">
           <Link to="/" className="button button-outline">
             <Globe size={17} />
             Voir le site
           </Link>
-          <Link to="/admin/courses" className="button">
-            <Plus size={17} />
-            Gérer les formations
-          </Link>
+          {admin.can("centre.courses") && (
+            <Link to="/admin/courses" className="button">
+              <Plus size={17} />
+              Gérer les formations
+            </Link>
+          )}
         </div>
       </div>
       {error && (

@@ -18,8 +18,10 @@ import { sections, dateLabel, statusLabels } from "../config/sections.js";
 import ResourceEditor from "../components/ResourceEditor.jsx";
 import RecordDetails from "../components/RecordDetails.jsx";
 import MessageComposer from "../components/MessageComposer.jsx";
+import { useAdmin } from "../context/AdminContext.jsx";
 
 export default function ResourcePage({ resource }) {
+  const admin = useAdmin();
   const config = sections[resource];
   const [data, setData] = useState({ items: [], total: 0, pages: 0 });
   const [courses, setCourses] = useState([]);
@@ -57,12 +59,17 @@ export default function ResourcePage({ resource }) {
       clearTimeout(timer);
     };
   }, [resource, query, page, filter, version]);
+  // Liste des formations accessible à tout compte connecté (pas seulement « Courses »).
   useEffect(() => {
     if (config.person)
-      adminApi("/resources/courses?limit=100")
+      adminApi("/lookups/courses")
         .then((value) => setCourses(value.items))
         .catch((failure) => setError(failure.message));
   }, [resource]);
+  const section = `centre.${resource}`;
+  const canCreate = admin.can(section, "create");
+  const canUpdate = admin.can(section, "update");
+  const canDelete = admin.can(section, "delete");
   async function remove(item) {
     if (
       !window.confirm(
@@ -116,13 +123,15 @@ export default function ResourcePage({ resource }) {
               Voir le site <ArrowUpRight size={16} />
             </Link>
           )}
-          <button
-            className="button"
-            onClick={() => setEditor({ record: null })}
-          >
-            <Plus size={17} />
-            {config.person ? "Ajouter une personne" : "Créer une publication"}
-          </button>
+          {canCreate && (
+            <button
+              className="button"
+              onClick={() => setEditor({ record: null })}
+            >
+              <Plus size={17} />
+              {config.person ? "Ajouter une personne" : "Créer une publication"}
+            </button>
+          )}
         </div>
       </div>
       <div className="admin-resource-bar">
@@ -279,13 +288,15 @@ export default function ResourcePage({ resource }) {
                       >
                         <Eye size={17} />
                       </button>
-                      <button
-                        aria-label={`Modifier ${item.name || item.title}`}
-                        title="Modifier"
-                        onClick={() => setEditor({ record: item })}
-                      >
-                        <Pencil size={16} />
-                      </button>
+                      {canUpdate && (
+                        <button
+                          aria-label={`Modifier ${item.name || item.title}`}
+                          title="Modifier"
+                          onClick={() => setEditor({ record: item })}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      )}
                       {config.person ? (
                         <>
                           <button
@@ -298,25 +309,29 @@ export default function ResourcePage({ resource }) {
                           >
                             <MessageCircle size={17} />
                           </button>
-                          <button
-                            aria-label={`E-mail ${item.name}`}
-                            title="E-mail"
-                            onClick={() =>
-                              setComposer({ channel: "email", record: item })
-                            }
-                          >
-                            <Mail size={17} />
-                          </button>
+                          {canUpdate && (
+                            <button
+                              aria-label={`E-mail ${item.name}`}
+                              title="E-mail"
+                              onClick={() =>
+                                setComposer({ channel: "email", record: item })
+                              }
+                            >
+                              <Mail size={17} />
+                            </button>
+                          )}
                         </>
                       ) : (
-                        <button
-                          className="action-delete"
-                          aria-label={`Supprimer ${item.title}`}
-                          title="Supprimer"
-                          onClick={() => remove(item)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        canDelete && (
+                          <button
+                            className="action-delete"
+                            aria-label={`Supprimer ${item.title}`}
+                            title="Supprimer"
+                            onClick={() => remove(item)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )
                       )}
                     </div>
                   </td>
@@ -382,10 +397,14 @@ export default function ResourcePage({ resource }) {
           record={view}
           config={config}
           onClose={() => setView(null)}
-          onEdit={(focusKey) => {
-            setView(null);
-            setEditor({ record: view, focusKey });
-          }}
+          onEdit={
+            canUpdate
+              ? (focusKey) => {
+                  setView(null);
+                  setEditor({ record: view, focusKey });
+                }
+              : undefined
+          }
         />
       )}
       {composer && (

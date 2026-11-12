@@ -12,3 +12,4 @@ test-results/
 playwright-report/
 artifacts/
 Backend/uploads/
+Backend/private-files/

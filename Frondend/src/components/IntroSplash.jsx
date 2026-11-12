@@ -28,7 +28,8 @@ function LogoPart({ clip }) {
 export default function IntroSplash() {
   const { t } = useLanguage();
   const { pathname } = useLocation();
-  const isPublic = (path) => !path.startsWith("/admin");
+  // L’administration et l’espace student ont leur propre écran d’ouverture.
+  const isPublic = (path) => !path.startsWith("/admin") && !path.startsWith("/etudiant");
   const [run, setRun] = useState({ id: 0, mode: "intro" });
   const [stage, setStage] = useState(() =>
     isPublic(pathname) ? "loading" : "done",

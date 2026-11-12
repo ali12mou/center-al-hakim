@@ -1,4 +1,6 @@
 const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+// Documents privés (RH, justificatifs) : servis par l’API, avec la session.
+export const fileUrl = (url) => (url?.startsWith("/api/") ? `${baseUrl}${url}` : url);
 let csrfToken = "";
 export function setAdminCsrf(value) {
   csrfToken = value || "";
@@ -99,11 +101,14 @@ async function send(path, { method = "GET", body, file } = {}) {
     );
     error.status = response.status;
     error.smtpUnavailable = data.smtpUnavailable;
+    error.otpExpired = data.otpExpired;
+    error.resendIn = data.resendIn;
     // 503 : l’API tourne mais MongoDB se connecte encore (ou est arrêté).
     error.unreachable = response.status === 503;
     if (
       response.status === 401 &&
-      !["/auth/login", "/auth/setup"].includes(path)
+      !path.startsWith("/auth/login") &&
+      !path.startsWith("/auth/otp")
     )
       listeners.forEach((listener) =>
         listener({ type: "expired", message: error.message }),

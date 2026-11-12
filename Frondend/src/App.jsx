@@ -13,22 +13,29 @@ import CertificationsPage from "./pages/CertificationsPage.jsx";
 import SkillAssessmentPage from "./pages/SkillAssessmentPage.jsx";
 import InscriptionPage from "./pages/InscriptionPage.jsx";
 import AdminApp from "./admin/AdminApp.jsx";
+import StudentApp from "./student/StudentApp.jsx";
 import IntroSplash from "./components/IntroSplash.jsx";
 import { LanguageProvider } from './context/LanguageContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
+import { recordVisit } from "./services/api.js";
 
 // En changeant de page, on repart du haut (sauf lien vers un bloc précis).
+// Chaque page publique affichée est comptée (anonymement) pour les rapports.
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
     if (!hash) window.scrollTo(0, 0);
   }, [pathname, hash]);
+  useEffect(() => {
+    if (!pathname.startsWith("/admin") && !pathname.startsWith("/etudiant")) recordVisit(pathname);
+  }, [pathname]);
   return null;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider><IntroSplash /><ScrollToTop /><Routes>
+      <ThemeProvider><LanguageProvider><IntroSplash /><ScrollToTop /><Routes>
         <Route path="/" element={<LandingSite />} />
         <Route path="/formations" element={<FormationsPage />} />
         <Route path="/centre" element={<CentrePage />} />
@@ -47,6 +54,7 @@ export default function App() {
         <Route path="/skill-assessment" element={<SkillAssessmentPage />} />
         <Route path="/inscription" element={<InscriptionPage />} />
         <Route path="/admin/*" element={<AdminApp />} />
+        <Route path="/etudiant/*" element={<StudentApp />} />
         <Route
           path="*"
           element={
@@ -58,7 +66,7 @@ export default function App() {
             </div>
           }
         />
-      </Routes></LanguageProvider>
+      </Routes></LanguageProvider></ThemeProvider>
     </BrowserRouter>
   );
 }

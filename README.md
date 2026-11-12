@@ -130,6 +130,15 @@ Si React et l’API sont hébergés séparément, créez `Frondend/.env` depuis 
 
 L’aperçu Sites héberge le frontend statique. Son catalogue public est exporté depuis le Backend lors du build ; il ne contient jamais les demandes des visiteurs. Sites n’exécute pas le serveur Express ni MongoDB. L’aperçu utilise donc WhatsApp tant qu’aucune API externe n’est configurée.
 
+## Langues et apparence
+
+Le site conserve ses trois langues : français, anglais et arabe (affichage de droite à gauche).
+Le bouton lune / soleil, à côté des langues sur le site et dans la barre de l’administration,
+permet de choisir le mode jour ou nuit. Il est également disponible sur les écrans de connexion
+et de changement du mot de passe temporaire. Le choix est mémorisé dans le navigateur et partagé
+entre le site et l’administration ; sans choix explicite, le thème suit celui de l’appareil.
+L’administration conserve son interface en français.
+
 ## Vérifications
 
 ```powershell

@@ -1,0 +1,194 @@
+/* Les deux apparences partagent la mise en page et les couleurs de la marque. */
+:root {
+  color-scheme: light;
+  --surface: #fff;
+  --page-ink: #19304f;
+  --heading: #193964;
+  --accent: #d71850;
+  --a-surface: #fff;
+  --control-bg: #fff;
+  --control-ink: #44566f;
+  --control-border: #e3e8f0;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e4ecf7;
+  background: #0d1728;
+  --page-ink: #e4ecf7;
+  --heading: #c5dafa;
+  --accent: #ff8fb1;
+  --surface: #152338;
+  --surface-soft: #192a41;
+  --muted: #a8b8ce;
+  --cream: #101d30;
+  --border: #304158;
+  --teal: #6bd4c4;
+  --tone-blue-bg: #1b3552;
+  --tone-blue-ink: #9bc9ff;
+  --tone-pink-bg: #3e2437;
+  --tone-pink-ink: #ffabc7;
+  --tone-green-bg: #173b37;
+  --tone-green-ink: #86d9b4;
+  --tone-amber-bg: #3b3020;
+  --tone-amber-ink: #f3cf8b;
+  --tone-red-bg: #402636;
+  --tone-red-ink: #ffadc2;
+  --a-bg: #0d1728;
+  --a-surface: #152338;
+  --a-surface-soft: #192a41;
+  --a-border: #304158;
+  --a-line: #28384e;
+  --a-ink: #e4ecf7;
+  --a-ink-2: #bccbe0;
+  --a-heading: #c5dafa;
+  --a-muted: #9caec6;
+  --a-accent: #ff8fb1;
+  --a-pink-soft: #3e2437;
+  --a-blue-soft: #1b3552;
+  --a-green: #86d9b4;
+  --a-green-soft: #173b37;
+  --a-amber: #f3cf8b;
+  --a-amber-soft: #3b3020;
+  --a-red: #ffadc2;
+  --a-red-soft: #402636;
+  --a-shadow: 0 2px 20px #0003;
+  --control-bg: #152338;
+  --control-ink: #c5dafa;
+  --control-border: #304158;
+}
+
+.display-preferences {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.language-switch > svg {
+  flex-shrink: 0;
+  margin-inline-end: 3px;
+  color: #bfd0e7;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 8px;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  color: var(--control-ink);
+  background: var(--control-bg);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.theme-toggle:hover {
+  background: var(--a-blue-soft);
+}
+
+.theme-toggle:focus-visible,
+.language-switch button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.topbar .theme-toggle {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 6px;
+  border-color: #ffffff40;
+  color: #e8edf5;
+  background: #ffffff0d;
+}
+
+.topbar .theme-toggle:hover {
+  background: #ffffff26;
+}
+
+.topbar .theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.auth-display-preferences {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+html[data-theme="dark"] body {
+  background: #0d1728;
+}
+
+html[data-theme="dark"] .header,
+html[data-theme="dark"] .admin-topbar {
+  background: #152338ed;
+}
+
+html[data-theme="dark"] .admin-auth-single {
+  background: radial-gradient(circle at 50% 0%, #1b3552, #0d1728 60%);
+}
+
+html[data-theme="dark"] .intro {
+  background: radial-gradient(circle at 50% 42%, #152338 0 40%, #0d1728 100%);
+}
+
+html[data-theme="dark"] .is-loading {
+  background: linear-gradient(90deg, #152338, #243650, #152338) 0 0 / 200% 100%;
+}
+
+html[data-theme="dark"] .admin-error {
+  background: var(--a-red-soft);
+  border-color: var(--a-border);
+}
+
+html[data-theme="dark"] .admin-success {
+  background: var(--a-green-soft);
+  border-color: var(--a-border);
+}
+
+html[data-theme="dark"] .brand-mark,
+html[data-theme="dark"] .auth-logo {
+  background: white;
+  border-radius: 7px;
+  padding: 3px;
+}
+
+html[data-theme="dark"] .admin-main .button-outline,
+html[data-theme="dark"] .auth-card .button-outline {
+  color: var(--a-heading);
+}
+
+@media (max-width: 650px) {
+  .display-preferences { gap: 6px; }
+  .language-switch > svg { display: none; }
+  .admin-topbar { gap: 8px; }
+  .admin-topbar-actions { gap: 6px; }
+}
+
+/* Factures, reçus et bulletins conservent un fond blanc à l’impression. */
+@media print {
+  .theme-toggle, .auth-display-preferences { display: none !important; }
+  html[data-theme="dark"] body { background: white; }
+  :root[data-theme="dark"] {
+    color-scheme: light;
+    --a-bg: #fff;
+    --a-surface: #fff;
+    --a-surface-soft: #f6f8fb;
+    --a-ink: #142a4a;
+    --a-ink-2: #44566f;
+    --a-muted: #66768c;
+    --a-heading: #193964;
+    --a-border: #e3e8f0;
+    --a-line: #eef1f6;
+    --surface: #fff;
+    --page-ink: #19304f;
+    --heading: #193964;
+  }
+}

@@ -287,8 +287,8 @@ export const courses = [
 
 export const centre = {
   name: "AL-HAKIM CENTER",
-  phone: "+253 77 70 13 92",
-  phoneLink: "+25377701392",
+  phone: "+253 77 70 34 36",
+  phoneLink: "+25377703436",
   whatsapp: "25377701392",
   // Premier message déjà rédigé quand un visiteur ouvre WhatsApp depuis le site.
   whatsappMessage:
