@@ -10,6 +10,7 @@ import { createApiRouter } from "./routes/api.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { createAdminRouter } from "./routes/admin.routes.js";
 import { createStudentRouter } from "./routes/student.routes.js";
+import { createMarketingRouter } from "./routes/marketing.routes.js";
 import { UPLOAD_DIR } from "./controllers/upload.controller.js";
 
 export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
@@ -80,6 +81,8 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
   app.use("/api/admin", createAdminRouter(ready));
   // Application des students : sessions et données séparées de l’administration.
   app.use("/api/student", createStudentRouter(ready));
+  // Portail des agents marketing : sessions séparées de l’administration.
+  app.use("/api/marketing", createMarketingRouter(ready));
   app.use(
     "/api",
     createApiRouter({ saveRequest, loadCourses, isDatabaseReady: ready }),

@@ -9,6 +9,9 @@ import {
   authStatus,
   verifyOtp,
   resendOtp,
+  forgotPassword,
+  verifyResetCode,
+  resetPassword,
   loginAdmin,
   logoutAdmin,
   changePassword,
@@ -37,6 +40,7 @@ import { createHrRouter } from "./hr.routes.js";
 import { createFinanceRouter } from "./finance.routes.js";
 import { createSystemRouter, createLookupRouter } from "./system.routes.js";
 import { createStudentsAdminRouter } from "./students-admin.routes.js";
+import { createMarketingAdminRouter } from "./marketing-admin.routes.js";
 import { canModule, isSuperAdmin } from "../config/permissions.js";
 
 const limiter = (windowMinutes, limit, error) =>
@@ -97,6 +101,15 @@ export function createAdminRouter(isDatabaseReady) {
   router.post("/auth/otp", loginLimit, verifyOtp);
   router.post("/auth/otp/resend", loginLimit, resendOtp);
   router.post("/auth/login", loginLimit, loginAdmin);
+  // Mot de passe oublié : limité plus strictement (envoi d’e-mails).
+  const forgotLimit = limiter(
+    15,
+    5,
+    "Trop de demandes de réinitialisation. Réessayez dans 15 minutes.",
+  );
+  router.post("/auth/forgot", forgotLimit, forgotPassword);
+  router.post("/auth/forgot/verify", loginLimit, verifyResetCode);
+  router.post("/auth/forgot/reset", passwordLimit, resetPassword);
   router.use(requireAdmin);
   router.post("/auth/logout", logoutAdmin);
   router.post("/auth/password", passwordLimit, changePassword);
@@ -135,5 +148,6 @@ export function createAdminRouter(isDatabaseReady) {
   router.use("/finance", createFinanceRouter());
   router.use("/system", createSystemRouter());
   router.use("/eleves", createStudentsAdminRouter());
+  router.use("/marketing", createMarketingAdminRouter());
   return router;
 }

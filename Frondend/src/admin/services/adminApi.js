@@ -108,7 +108,8 @@ async function send(path, { method = "GET", body, file } = {}) {
     if (
       response.status === 401 &&
       !path.startsWith("/auth/login") &&
-      !path.startsWith("/auth/otp")
+      !path.startsWith("/auth/otp") &&
+      !path.startsWith("/auth/forgot")
     )
       listeners.forEach((listener) =>
         listener({ type: "expired", message: error.message }),

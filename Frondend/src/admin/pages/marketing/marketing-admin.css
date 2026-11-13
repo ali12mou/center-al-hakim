@@ -1,0 +1,51 @@
+/* Marketing et prospection (administration) */
+.marketing-portal-banner {
+  align-items: center;
+}
+.marketing-portal-banner > span {
+  flex: 1;
+}
+.marketing-status-cell {
+  display: grid;
+  gap: 3px;
+  justify-items: start;
+}
+.marketing-status-cell small {
+  color: var(--a-muted, #5b6b80);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.marketing-transition {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: var(--a-muted, #5b6b80);
+}
+.marketing-rate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 120px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--a-soft, #f1f4f8);
+  overflow: hidden;
+}
+.marketing-rate i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #22b8a6, #1d4a85);
+  opacity: 0.25;
+}
+.marketing-rate b {
+  position: relative;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+.marketing-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 14px;
+}

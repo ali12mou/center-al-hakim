@@ -5,6 +5,7 @@ import {
   BarChart3,
   Eye,
   EyeOff,
+  CircleCheck,
   Info,
   LoaderCircle,
   LockKeyhole,
@@ -18,6 +19,7 @@ import {
 import { LOGO } from "../../components/logoParts.js";
 import { adminApi } from "../services/adminApi.js";
 import ThemeToggle from "../../components/ThemeToggle.jsx";
+import { ForgotEmailStep, NewPasswordStep } from "./ForgotPassword.jsx";
 import "../login.css";
 
 const CODE_LENGTH = 6;
@@ -46,6 +48,9 @@ export default function AuthScreen({
   const [visible, setVisible] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
   const [username, setUsername] = useState("");
+  const [account, setAccount] = useState(null);
+  const [success, setSuccess] = useState("");
+  const forgotFlow = step.startsWith("forgot");
   const blocked = Boolean(initialError);
   const detectCaps = (event) =>
     setCapsLock(Boolean(event.getModifierState?.("CapsLock")));
@@ -55,17 +60,12 @@ export default function AuthScreen({
     setBusy(true);
     setError("");
     setInfo("");
+    setSuccess("");
     const body = Object.fromEntries(new FormData(event.currentTarget));
     try {
       const result = await adminApi("/auth/login", { method: "POST", body });
       if (result.otpRequired) {
-        setChallenge({
-          id: result.challenge,
-          email: result.email,
-          console: result.delivery === "console",
-          expiresAt: Date.now() + result.expiresIn * 1000,
-          resendAt: Date.now() + result.resendIn * 1000,
-        });
+        setChallenge(toChallenge(result));
         setStep("otp");
         setBusy(false);
       } else onAuthenticated(result);
@@ -74,11 +74,16 @@ export default function AuthScreen({
       setBusy(false);
     }
   }
-  function restart(message = "") {
-    setStep("credentials");
+  function restart(message = "", target = "credentials") {
+    setStep(target);
     setChallenge(null);
+    setAccount(null);
     setInfo("");
     setError(message);
+  }
+  function startForgot() {
+    setSuccess("");
+    restart("", "forgot");
   }
 
   return (
@@ -144,14 +149,35 @@ export default function AuthScreen({
             </span>
           </div>
 
-          <ol className="login-steps" aria-label="Étapes de connexion">
-            <li className={step === "credentials" ? "active" : "done"}>
-              <span>1</span>Identifiants
-            </li>
-            <li className={step === "otp" ? "active" : ""}>
-              <span>2</span>Code e-mail
-            </li>
-          </ol>
+          {forgotFlow ? (
+            <ol className="login-steps login-steps-3" aria-label="Étapes de réinitialisation">
+              {[
+                ["forgot", "E-mail"],
+                ["forgot-otp", "Code"],
+                ["forgot-password", "Nouveau mot de passe"],
+              ].map(([id, label], index, all) => {
+                const current = all.findIndex(([key]) => key === step);
+                return (
+                  <li
+                    key={id}
+                    className={index === current ? "active" : index < current ? "done" : ""}
+                  >
+                    <span>{index + 1}</span>
+                    {label}
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <ol className="login-steps" aria-label="Étapes de connexion">
+              <li className={step === "credentials" ? "active" : "done"}>
+                <span>1</span>Identifiants
+              </li>
+              <li className={step === "otp" ? "active" : ""}>
+                <span>2</span>Code e-mail
+              </li>
+            </ol>
+          )}
 
           {step === "credentials" ? (
             <form onSubmit={submitCredentials}>
@@ -159,7 +185,13 @@ export default function AuthScreen({
               <p className="login-lead">
                 Connectez-vous avec votre nom d’utilisateur et votre mot de passe.
               </p>
-              {notice && !error && (
+              {success && !error && (
+                <p className="auth-notice login-success" role="status">
+                  <CircleCheck size={17} />
+                  {success}
+                </p>
+              )}
+              {notice && !error && !success && (
                 <p className="auth-notice" role="status">
                   <Info size={17} />
                   {notice}
@@ -219,6 +251,11 @@ export default function AuthScreen({
                   </button>
                 </span>
               </label>
+              <div className="login-forgot-row">
+                <button type="button" className="login-forgot" onClick={startForgot}>
+                  Mot de passe oublié ?
+                </button>
+              </div>
               {capsLock && (
                 <small className="auth-caps" role="status">
                   <TriangleAlert size={15} />
@@ -245,7 +282,7 @@ export default function AuthScreen({
                 )}
               </button>
             </form>
-          ) : (
+          ) : step === "otp" ? (
             <OtpStep
               challenge={challenge}
               setChallenge={setChallenge}
@@ -255,7 +292,51 @@ export default function AuthScreen({
               setInfo={setInfo}
               onBack={() => restart()}
               onExpired={(message) => restart(message)}
-              onAuthenticated={onAuthenticated}
+              onVerified={onAuthenticated}
+            />
+          ) : step === "forgot" ? (
+            <ForgotEmailStep
+              initialError={error}
+              onBack={() => restart()}
+              onSent={(result) => {
+                setError("");
+                setChallenge(toChallenge(result));
+                setStep("forgot-otp");
+              }}
+            />
+          ) : step === "forgot-otp" ? (
+            <OtpStep
+              challenge={challenge}
+              setChallenge={setChallenge}
+              error={error}
+              setError={setError}
+              info={info}
+              setInfo={setInfo}
+              verifyPath="/auth/forgot/verify"
+              title="Code de réinitialisation"
+              lead="pour vérifier que ce compte vous appartient."
+              submitLabel="Vérifier le code"
+              backLabel="Changer d’adresse"
+              onBack={() => restart("", "forgot")}
+              onExpired={(message) => restart(message, "forgot")}
+              onVerified={(result) => {
+                setAccount(result);
+                setError("");
+                setInfo("");
+                setStep("forgot-password");
+              }}
+            />
+          ) : (
+            <NewPasswordStep
+              challenge={challenge.id}
+              account={account}
+              onBack={() => restart()}
+              onExpired={(message) => restart(message, "forgot")}
+              onDone={(result) => {
+                restart();
+                setUsername(result.username);
+                setSuccess(result.message);
+              }}
             />
           )}
 
@@ -269,6 +350,14 @@ export default function AuthScreen({
   );
 }
 
+const toChallenge = (result) => ({
+  id: result.challenge,
+  email: result.email,
+  console: result.delivery === "console",
+  expiresAt: Date.now() + result.expiresIn * 1000,
+  resendAt: Date.now() + result.resendIn * 1000,
+});
+
 function OtpStep({
   challenge,
   setChallenge,
@@ -278,7 +367,12 @@ function OtpStep({
   setInfo,
   onBack,
   onExpired,
-  onAuthenticated,
+  onVerified,
+  verifyPath = "/auth/otp",
+  title = "Vérifiez votre e-mail",
+  lead = "pour accéder au tableau de bord.",
+  submitLabel = "Vérifier et continuer",
+  backLabel = "Changer de compte",
 }) {
   const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
   const [busy, setBusy] = useState(false);
@@ -302,8 +396,8 @@ function OtpStep({
     setError("");
     setInfo("");
     try {
-      onAuthenticated(
-        await adminApi("/auth/otp", {
+      onVerified(
+        await adminApi(verifyPath, {
           method: "POST",
           body: { challenge: challenge.id, code: value },
         }),
@@ -378,16 +472,17 @@ function OtpStep({
       <span className="login-otp-icon">
         <MailCheck size={26} />
       </span>
-      <h1>Vérifiez votre e-mail</h1>
+      <h1>{title}</h1>
       <p className="login-lead">
         Nous avons envoyé un code à 6 chiffres à <strong>{challenge.email}</strong>.
-        Saisissez-le pour accéder au tableau de bord.
+        Saisissez-le {lead}
       </p>
       {challenge.console && (
         <p className="auth-notice login-dev-notice" role="status">
           <Info size={17} />
           <span>
-            Mode développement : l’envoi d’e-mails (SMTP) n’est pas encore configuré.
+            Mode développement : l’e-mail n’a pas pu être envoyé (SMTP non configuré ou
+            refusé par Gmail).
             Le code s’affiche dans le terminal de <strong>npm run dev</strong>, sur la
             ligne <code>[OTP]</code>.
           </span>
@@ -447,7 +542,7 @@ function OtpStep({
           </>
         ) : (
           <>
-            Vérifier et continuer
+            {submitLabel}
             <ArrowRight size={18} />
           </>
         )}
@@ -455,7 +550,7 @@ function OtpStep({
       <div className="login-otp-actions">
         <button type="button" onClick={onBack}>
           <ArrowLeft size={15} />
-          Changer de compte
+          {backLabel}
         </button>
         <button type="button" onClick={resend} disabled={sending || resendIn > 0}>
           <RefreshCw size={15} className={sending ? "spin" : ""} />

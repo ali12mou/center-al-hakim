@@ -553,7 +553,8 @@ export function createLookupRouter() {
         can(user, "finance.schedules", "view") ||
         can(user, "finance.payments", "create") ||
         can(user, "finance.students", "view") ||
-        can(user, "centre.registrations", "view"),
+        can(user, "centre.registrations", "view") ||
+        can(user, "centre.prospects", "update"),
     ),
     wrap(async (req, res) => {
       const q = typeof req.query.q === "string" ? req.query.q.slice(0, 100).trim() : "";

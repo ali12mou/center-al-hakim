@@ -26,6 +26,8 @@ export const MODULES = [
       section("centre.registrations", "Inscriptions", ["view", "create", "update"]),
       section("centre.contacts", "Contacts", ["view", "create", "update"]),
       section("centre.assessments", "Skill Assessment et résultats"),
+      section("centre.marketingAgents", "Agents marketing"),
+      section("centre.prospects", "Collecte des prospects"),
       section("centre.slides", "Accueil (diaporama)"),
       section("centre.courses", "Formations (Courses)"),
       section("centre.competences", "Compétences"),

@@ -505,6 +505,50 @@
   cursor: default;
 }
 
+/* Mot de passe oublié */
+.login-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px 0 14px;
+}
+.login-forgot {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--l-pink);
+  cursor: pointer;
+}
+.login-forgot:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.login-card .login-success {
+  background: #22b8a614;
+  border-color: #22b8a640;
+  color: #0f7a6f;
+}
+.login-steps-3 li {
+  padding: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.login-steps-3 li span {
+  flex: none;
+}
+.login-card .login-meter {
+  margin: -4px 0 10px;
+}
+.login-card .login-rules {
+  margin: 0 0 16px;
+}
+.login-card .password-mismatch {
+  display: block;
+  margin: -6px 0 12px;
+}
+
 @media (max-width: 960px) {
   .login-page {
     grid-template-columns: 1fr;

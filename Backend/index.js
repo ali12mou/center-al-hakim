@@ -6,6 +6,7 @@ import { platformModels } from "./models/platform.models.js";
 import { hrModels } from "./models/hr.models.js";
 import { financeModels } from "./models/finance.models.js";
 import { systemModels } from "./models/system.models.js";
+import { marketingModels } from "./models/marketing.models.js";
 import { Course, Request } from "./models/index.js";
 import { seedPlatform } from "./services/platform.service.js";
 import { seedFinance } from "./services/finance.service.js";
@@ -31,7 +32,7 @@ if (process.env.MONGODB_URI) {
       serverSelectionTimeoutMS: 5000,
     });
     await Promise.all(
-      [...platformModels, ...hrModels, ...financeModels, ...systemModels, Course, Request].map(
+      [...platformModels, ...hrModels, ...financeModels, ...systemModels, ...marketingModels, Course, Request].map(
         (model) => model.init(),
       ),
     );

@@ -49,13 +49,19 @@ const dateLabel = (date) =>
   }).format(date);
 
 // Message d’information envoyé à chaque connexion à l’administration.
-export function otpEmail({ name, code, minutes, ip, device, at = new Date() }) {
+export function otpEmail({ name, code, minutes, ip, device, at = new Date(), purpose = "login" }) {
   const when = dateLabel(at);
-  const subject = `${code} — Code de connexion AL-HAKIM CENTER`;
+  const reset = purpose === "reset";
+  const subject = reset
+    ? `${code} — Réinitialisation du mot de passe AL-HAKIM CENTER`
+    : `${code} — Code de connexion AL-HAKIM CENTER`;
+  const intro = reset
+    ? "Une réinitialisation du mot de passe de votre compte administrateur vient d’être demandée."
+    : "Une connexion à votre compte administrateur vient d’être demandée.";
   const text = [
     `Bonjour ${name},`,
     "",
-    "Une connexion à l’espace administration AL-HAKIM CENTER vient d’être demandée.",
+    intro,
     "",
     `Votre code de vérification : ${code}`,
     `Il est valable ${minutes} minutes et ne peut servir qu’une seule fois.`,
@@ -66,7 +72,7 @@ export function otpEmail({ name, code, minutes, ip, device, at = new Date() }) {
     `- Appareil : ${device || "inconnu"}`,
     "",
     "Si vous n’êtes pas à l’origine de cette demande, ne communiquez ce code à personne",
-    "et changez immédiatement votre mot de passe.",
+    reset ? "et ignorez ce message : votre mot de passe reste inchangé." : "et changez immédiatement votre mot de passe.",
     "",
     "AL-HAKIM CENTER — Learn Today. Lead Tomorrow.",
   ].join("\n");
@@ -84,17 +90,17 @@ export function otpEmail({ name, code, minutes, ip, device, at = new Date() }) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 40px rgba(13,34,65,.12)">
 <tr><td style="background:linear-gradient(135deg,#0d2241 0%,#193964 60%,#d71850 140%);background-color:#0d2241;padding:28px 32px">
 <div style="color:#ffffff;font-size:18px;font-weight:800;letter-spacing:.6px">AL-HAKIM CENTER</div>
-<div style="color:#b9c8e0;font-size:13px;margin-top:4px">Espace administration · Vérification de connexion</div>
+<div style="color:#b9c8e0;font-size:13px;margin-top:4px">Espace administration · ${reset ? "Mot de passe oublié" : "Vérification de connexion"}</div>
 </td></tr>
 <tr><td style="padding:32px">
 <p style="margin:0 0 6px;color:#142a4a;font-size:17px;font-weight:700">Bonjour ${escapeHtml(name)},</p>
-<p style="margin:0 0 24px;color:#44566f;font-size:14px;line-height:1.6">Une connexion à votre compte administrateur vient d’être demandée. Saisissez ce code pour la confirmer :</p>
+<p style="margin:0 0 24px;color:#44566f;font-size:14px;line-height:1.6">${intro} Saisissez ce code pour ${reset ? "choisir un nouveau mot de passe" : "la confirmer"} :</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 14px"><tr>${digits}</tr></table>
 <p style="margin:0 0 26px;text-align:center;color:#d71850;font-size:13px;font-weight:600">Valable ${minutes} minutes · usage unique</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;border-radius:12px;padding:14px 18px">
 ${row("Date", when)}${row("Adresse IP", ip || "inconnue")}${row("Appareil", device || "inconnu")}
 </table>
-<p style="margin:22px 0 0;padding:14px 16px;background:#fdebf1;border-radius:10px;color:#8f1238;font-size:13px;line-height:1.55"><strong>Ce n’est pas vous ?</strong> Ne communiquez ce code à personne et changez immédiatement votre mot de passe. L’équipe AL-HAKIM CENTER ne vous demandera jamais ce code.</p>
+<p style="margin:22px 0 0;padding:14px 16px;background:#fdebf1;border-radius:10px;color:#8f1238;font-size:13px;line-height:1.55"><strong>Ce n’est pas vous ?</strong> Ne communiquez ce code à personne${reset ? " : votre mot de passe reste inchangé tant que le code n’est pas utilisé." : " et changez immédiatement votre mot de passe."} L’équipe AL-HAKIM CENTER ne vous demandera jamais ce code.</p>
 </td></tr>
 <tr><td style="padding:18px 32px;border-top:1px solid #eef1f6;color:#8a98ab;font-size:12px;text-align:center">AL-HAKIM CENTER — Learn Today. Lead Tomorrow.<br>Message automatique, merci de ne pas y répondre.</td></tr>
 </table></td></tr></table></body></html>`;

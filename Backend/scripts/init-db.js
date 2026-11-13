@@ -7,6 +7,7 @@ import { financeModels } from "../models/finance.models.js";
 import { systemModels } from "../models/system.models.js";
 import { Course, Request } from "../models/index.js";
 import { studentModels } from "../models/student.models.js";
+import { marketingModels } from "../models/marketing.models.js";
 import { seedPlatform } from "../services/platform.service.js";
 import { seedFinance } from "../services/finance.service.js";
 
@@ -17,7 +18,7 @@ try {
     { serverSelectionTimeoutMS: 5000 },
   );
   await Promise.all(
-    [...platformModels, ...hrModels, ...financeModels, ...systemModels, ...studentModels, Course, Request].map(
+    [...platformModels, ...hrModels, ...financeModels, ...systemModels, ...studentModels, ...marketingModels, Course, Request].map(
       (model) => model.init(),
     ),
   );

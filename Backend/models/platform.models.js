@@ -97,6 +97,9 @@ const otpSchema = new mongoose.Schema({
     index: true,
   },
   codeHash: { type: String, required: true },
+  // login : connexion ; reset : mot de passe oublié (verified une fois le code juste).
+  purpose: { type: String, enum: ["login", "reset"], default: "login" },
+  verified: { type: Boolean, default: false },
   attempts: { type: Number, default: 0 },
   resends: { type: Number, default: 0 },
   sentAt: { type: Date, default: Date.now },
@@ -123,6 +126,7 @@ export const auditEvents = [
   "session_revoked",
   "otp_sent",
   "otp_failure",
+  "password_forgot",
 ];
 const auditSchema = new mongoose.Schema({
   event: { type: String, enum: auditEvents, required: true },

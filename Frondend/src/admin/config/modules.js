@@ -44,6 +44,7 @@ import {
   KeyRound,
   Megaphone,
   School,
+  Target,
 } from "lucide-react";
 
 // Menus des quatre espaces. `section` : permission « consulter » requise
@@ -90,6 +91,13 @@ export const MODULE_MENUS = [
           item("/admin/registrations", "Inscrits", Users, "centre.registrations", { badge: "registrations" }),
           item("/admin/contacts", "Contacts", Mail, "centre.contacts", { badge: "contacts" }),
           item("/admin/assessments", "Skill Assessment", ClipboardCheck, "centre.assessments"),
+        ],
+      },
+      {
+        label: "Marketing et prospection",
+        items: [
+          item("/admin/marketing/agents", "Agents marketing", Megaphone, "centre.marketingAgents"),
+          item("/admin/marketing/prospects", "Collecte des prospects", Target, "centre.prospects"),
         ],
       },
       {

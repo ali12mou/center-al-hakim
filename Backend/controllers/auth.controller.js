@@ -129,20 +129,22 @@ function maskEmail(email = "") {
   const visible = local.slice(0, Math.min(2, local.length));
   return `${visible}${"•".repeat(Math.max(3, local.length - visible.length))}@${domain}`;
 }
-const findOtp = (challenge) =>
+const findOtp = (challenge, purpose) =>
   AdminOtp.findOne({
     challengeHash: hashToken(challenge),
     expiresAt: { $gt: new Date() },
+    ...(purpose ? { purpose } : {}),
   });
 const expiredOtp = (res) =>
   res.status(400).json({
-    error: "Ce code a expiré ou n’est plus valable. Reconnectez-vous.",
+    error: "Ce code a expiré ou n’est plus valable. Recommencez.",
     otpExpired: true,
   });
 
 class MailError extends Error {}
-async function deliverOtp(user, code, req) {
+async function deliverOtp(user, code, req, purpose = "login") {
   const message = otpEmail({
+    purpose,
     name: user.name,
     code,
     minutes: OTP_TTL / 60_000,
@@ -164,12 +166,19 @@ async function deliverOtp(user, code, req) {
     await sendMail({ to: user.email, ...message });
   } catch (error) {
     console.error("[OTP] Envoi de l’e-mail impossible :", error.message);
+    // Développement : un SMTP en panne ne bloque pas l’accès, le code passe par le terminal.
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `\n[OTP] Secours terminal — code pour ${user.username} (${user.email}) : ${code}\n`,
+      );
+      return "console";
+    }
     throw new MailError(
       "Le code de vérification n’a pas pu être envoyé par e-mail. Réessayez dans un instant.",
     );
   }
 }
-async function issueOtp(user, req) {
+async function issueOtp(user, req, purpose = "login") {
   const challenge = randomBytes(32).toString("hex");
   const code = newCode();
   // Un seul code actif par compte : une nouvelle connexion annule l’ancien.
@@ -179,10 +188,11 @@ async function issueOtp(user, req) {
     challengeHash: hashToken(challenge),
     userId: user._id,
     codeHash: otpHash(challenge, code),
+    purpose,
     expiresAt: new Date(Date.now() + OTP_TTL),
   });
   try {
-    delivery = await deliverOtp(user, code, req);
+    delivery = await deliverOtp(user, code, req, purpose);
   } catch (error) {
     await AdminOtp.deleteOne({ _id: otp._id });
     throw error;
@@ -249,6 +259,43 @@ export async function loginAdmin(req, res, next) {
     next(error);
   }
 }
+// Vérifie le code saisi ; en cas d’échec la réponse est déjà envoyée (retourne null).
+async function checkCode({ challenge, code }, purpose, req, res) {
+  const otp = await findOtp(challenge, purpose);
+  if (!otp || otp.verified) {
+    expiredOtp(res);
+    return null;
+  }
+  const user = await AdminUser.findById(otp.userId);
+  if (!user || user.active === false) {
+    await AdminOtp.deleteOne({ _id: otp._id });
+    expiredOtp(res);
+    return null;
+  }
+  if (!sameHash(otp.codeHash, otpHash(challenge, code))) {
+    otp.attempts += 1;
+    await audit("otp_failure", req, { user });
+    // Les mauvais codes comptent aussi dans le verrouillage du compte.
+    const locked = await registerLoginFailure(user.username);
+    if (locked || otp.attempts >= OTP_MAX_ATTEMPTS) {
+      await AdminOtp.deleteOne({ _id: otp._id });
+      if (locked) lockedResponse(res, locked);
+      else
+        res.status(400).json({
+          error: "Trop de codes incorrects. Recommencez pour recevoir un nouveau code.",
+          otpExpired: true,
+        });
+      return null;
+    }
+    await otp.save();
+    const left = OTP_MAX_ATTEMPTS - otp.attempts;
+    res.status(400).json({
+      error: `Code incorrect. Il vous reste ${left} essai${left > 1 ? "s" : ""}.`,
+    });
+    return null;
+  }
+  return { otp, user };
+}
 export async function verifyOtp(req, res, next) {
   try {
     const parsed = otpSchema.safeParse(req.body);
@@ -256,34 +303,9 @@ export async function verifyOtp(req, res, next) {
       return res
         .status(400)
         .json({ error: "Saisissez le code à 6 chiffres reçu par e-mail." });
-    const { challenge, code } = parsed.data;
-    const otp = await findOtp(challenge);
-    if (!otp) return expiredOtp(res);
-    const user = await AdminUser.findById(otp.userId);
-    if (!user || user.active === false) {
-      await AdminOtp.deleteOne({ _id: otp._id });
-      return expiredOtp(res);
-    }
-    if (!sameHash(otp.codeHash, otpHash(challenge, code))) {
-      otp.attempts += 1;
-      await audit("otp_failure", req, { user });
-      // Les mauvais codes comptent aussi dans le verrouillage du compte.
-      const locked = await registerLoginFailure(user.username);
-      if (locked || otp.attempts >= OTP_MAX_ATTEMPTS) {
-        await AdminOtp.deleteOne({ _id: otp._id });
-        if (locked) return lockedResponse(res, locked);
-        return res.status(400).json({
-          error:
-            "Trop de codes incorrects. Reconnectez-vous pour recevoir un nouveau code.",
-          otpExpired: true,
-        });
-      }
-      await otp.save();
-      const left = OTP_MAX_ATTEMPTS - otp.attempts;
-      return res.status(400).json({
-        error: `Code incorrect. Il vous reste ${left} essai${left > 1 ? "s" : ""}.`,
-      });
-    }
+    const checked = await checkCode(parsed.data, "login", req, res);
+    if (!checked) return;
+    const { otp, user } = checked;
     await AdminOtp.deleteOne({ _id: otp._id });
     await clearLoginFailures(user.username);
     res.json(await completeLogin(user, req, res));
@@ -297,7 +319,7 @@ export async function resendOtp(req, res, next) {
     if (!parsed.success) return expiredOtp(res);
     const { challenge } = parsed.data;
     const otp = await findOtp(challenge);
-    if (!otp) return expiredOtp(res);
+    if (!otp || otp.verified) return expiredOtp(res);
     const wait = otp.sentAt.getTime() + OTP_RESEND_DELAY - Date.now();
     if (wait > 0)
       return res.status(429).json({
@@ -306,14 +328,14 @@ export async function resendOtp(req, res, next) {
       });
     if (otp.resends >= OTP_MAX_RESENDS)
       return res.status(429).json({
-        error: "Nombre maximal d’envois atteint. Reconnectez-vous.",
+        error: "Nombre maximal d’envois atteint. Recommencez.",
         otpExpired: true,
       });
     const user = await AdminUser.findById(otp.userId);
     if (!user || user.active === false) return expiredOtp(res);
     const code = newCode();
     try {
-      await deliverOtp(user, code, req);
+      await deliverOtp(user, code, req, otp.purpose);
     } catch (error) {
       if (error instanceof MailError)
         return res.status(502).json({ error: error.message });
@@ -330,6 +352,100 @@ export async function resendOtp(req, res, next) {
       message: "Un nouveau code vient de vous être envoyé.",
       expiresIn: OTP_TTL / 1000,
       resendIn: OTP_RESEND_DELAY / 1000,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+// Mot de passe oublié : e-mail du compte → code à 6 chiffres → nouveau mot de passe.
+const forgotSchema = z
+  .object({ email: z.string().trim().toLowerCase().email().max(254) })
+  .strict();
+const resetSchema = z
+  .object({ challenge: challengeField, newPassword: z.string().min(1).max(128) })
+  .strict();
+export async function forgotPassword(req, res, next) {
+  try {
+    const parsed = forgotSchema.safeParse(req.body);
+    if (!parsed.success)
+      return res.status(400).json({ error: "Saisissez une adresse e-mail valide." });
+    const { email } = parsed.data;
+    const user = await AdminUser.findOne({ email, active: { $ne: false } }).sort({
+      role: 1,
+      createdAt: 1,
+    });
+    if (!user) {
+      // Même réponse qu’un compte existant : les adresses enregistrées restent secrètes.
+      await timingHash();
+      return res.json({
+        otpRequired: true,
+        challenge: randomBytes(32).toString("hex"),
+        email: maskEmail(email),
+        expiresIn: OTP_TTL / 1000,
+        resendIn: OTP_RESEND_DELAY / 1000,
+      });
+    }
+    await audit("password_forgot", req, { user });
+    try {
+      res.json(await issueOtp(user, req, "reset"));
+    } catch (error) {
+      if (error instanceof MailError)
+        return res.status(502).json({ error: error.message });
+      throw error;
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+export async function verifyResetCode(req, res, next) {
+  try {
+    const parsed = otpSchema.safeParse(req.body);
+    if (!parsed.success)
+      return res
+        .status(400)
+        .json({ error: "Saisissez le code à 6 chiffres reçu par e-mail." });
+    const checked = await checkCode(parsed.data, "reset", req, res);
+    if (!checked) return;
+    const { otp, user } = checked;
+    otp.verified = true;
+    otp.expiresAt = new Date(Date.now() + OTP_TTL);
+    await otp.save();
+    res.json({ verified: true, username: user.username, name: user.name });
+  } catch (error) {
+    next(error);
+  }
+}
+export async function resetPassword(req, res, next) {
+  try {
+    const parsed = resetSchema.safeParse(req.body);
+    if (!parsed.success)
+      return res.status(400).json({ error: "Saisissez votre nouveau mot de passe." });
+    const { challenge, newPassword } = parsed.data;
+    const otp = await findOtp(challenge, "reset");
+    if (!otp?.verified) return expiredOtp(res);
+    const user = await AdminUser.findById(otp.userId).select("+passwordHash");
+    if (!user || user.active === false) {
+      await AdminOtp.deleteOne({ _id: otp._id });
+      return expiredOtp(res);
+    }
+    const problem = passwordProblem(newPassword, user);
+    if (problem) return res.status(400).json({ error: problem });
+    if (await verifyPassword(newPassword, user.passwordHash))
+      return res
+        .status(400)
+        .json({ error: "Choisissez un mot de passe différent de l’actuel." });
+    user.passwordHash = await hashPassword(newPassword);
+    user.mustChangePassword = false;
+    user.passwordChangedAt = new Date();
+    await user.save();
+    await AdminOtp.deleteMany({ userId: user._id });
+    // Toutes les sessions ouvertes sont fermées et le compte est débloqué.
+    await AdminSession.deleteMany({ userId: user._id });
+    await clearLoginFailures(user.username);
+    await audit("password_reset", req, { user });
+    res.json({
+      message: "Mot de passe modifié. Connectez-vous avec votre nouveau mot de passe.",
+      username: user.username,
     });
   } catch (error) {
     next(error);

@@ -41,6 +41,7 @@ import AccountsPage, { TransfersPage } from "./pages/finance/AccountsPage.jsx";
 import FinanceReportsPage from "./pages/finance/FinanceReportsPage.jsx";
 import FinanceSettingsPage from "./pages/finance/FinanceSettingsPage.jsx";
 import StudentAccessPage from "./pages/eleves/AccessPage.jsx";
+import { AgentsPage, ProspectsPage } from "./pages/marketing/MarketingPages.jsx";
 import LessonsPage from "./pages/eleves/LessonsPage.jsx";
 import StudentAttendancePage from "./pages/eleves/AttendancePage.jsx";
 import GradesPage from "./pages/eleves/GradesPage.jsx";
@@ -148,6 +149,8 @@ function AdminShell({ auth, badges, collapsed, onToggle, onLogout, onSessionRene
 
             {/* Gestion du centre */}
             <Route path="centre" element={<Guard section="centre.dashboard"><DashboardPage user={user} /></Guard>} />
+            <Route path="marketing/agents" element={<Guard section="centre.marketingAgents"><AgentsPage /></Guard>} />
+            <Route path="marketing/prospects" element={<Guard section="centre.prospects"><ProspectsPage /></Guard>} />
             {Object.keys(sections).map((resource) => (
               <Route
                 key={resource}
