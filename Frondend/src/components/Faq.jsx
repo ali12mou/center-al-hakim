@@ -16,6 +16,7 @@ export default function Faq({ items }) {
             <br />
             information claire.
           </p>
+          <a className="text-link faq-contact" href="#contact">Une autre question ? Contactez-nous <Plus size={16} /></a>
         </div>
         <div className="faq-list">
           {items.map((item) => (

@@ -106,6 +106,7 @@ export function Departments({ departments, onDepartment }) {
                 <h3>{department.title}</h3>
                 <p>{department.description}</p>
                 <span className="department-arrow">
+                  Explorer les formations
                   <ArrowUpRight size={19} />
                 </span>
               </a>

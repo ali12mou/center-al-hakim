@@ -7,6 +7,10 @@ export default function Footer({ centre, departments, onPrivacy, onLegal }) {
   return (
     <footer className="footer">
       <div className="container">
+        <div className="footer-intro">
+          <div><span className="eyebrow">VOTRE PROCHAINE ÉTAPE COMMENCE ICI</span><h2>Apprendre aujourd’hui.<br />Aller plus loin demain.</h2></div>
+          <Link to="/formations" className="button button-white">Explorer nos formations <ArrowUpRight size={18} /></Link>
+        </div>
         <div className="footer-grid">
           <div className="footer-brand">
             <a href="/#accueil" aria-label="Retour à l’accueil">
