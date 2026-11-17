@@ -69,7 +69,6 @@ export default function Footer({ centre, departments, onPrivacy, onLegal }) {
           <div>
             <button onClick={onLegal}>Informations du centre</button>
             <button onClick={onPrivacy}>Confidentialité</button>
-            <a href="/admin/login">Administration</a>
             <a
               href="#contenu"
               onClick={(event) => {

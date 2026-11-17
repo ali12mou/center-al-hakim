@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { MapPin, Phone, Mail, ArrowUpRight, Menu, X, ShieldCheck } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowUpRight, Menu, X } from "lucide-react";
 import Brand from "./Brand.jsx";
 import { useLanguage } from '../context/LanguageContext.jsx';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
@@ -22,9 +22,6 @@ export default function Header({ centre, navigation }) {
           </a>
           <a href={`mailto:${centre.email}`} className="topbar-email" dir="ltr" aria-label={centre.email} title={centre.email}>
             <Mail size={13} /> <span>{centre.email}</span>
-          </a>
-          <a href="/admin/login" className="admin-access" aria-label={t('Accès administrateur')} title={t('Accès administrateur')}>
-            <ShieldCheck size={16} /> <span>{t('Administration')}</span>
           </a>
           <div className="display-preferences"><LanguageSwitcher /><ThemeToggle /></div></div>
         </div>

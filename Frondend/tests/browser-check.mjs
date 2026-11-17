@@ -74,7 +74,7 @@ try {
   const whatsapp = await page
     .getByRole("link", { name: "Continuer sur WhatsApp" })
     .getAttribute("href");
-  assert.ok(whatsapp.startsWith("https://wa.me/25377701392?text="));
+  assert.ok(whatsapp.startsWith("https://wa.me/25377703436?text="));
   assert.ok(
     decodeURIComponent(whatsapp).includes("Anglais général & professionnel"),
   );
