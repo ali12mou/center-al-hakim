@@ -11,6 +11,7 @@ import {
   STUDENT_ATTENDANCE,
 } from "../models/student.models.js";
 import { StudentAccount } from "../models/finance.models.js";
+import { mountCardAdmin } from "./portal.routes.js";
 import { permit } from "../middleware/admin.middleware.js";
 import { canModule } from "../config/permissions.js";
 import { hashPassword, temporaryPassword } from "../services/password.service.js";
@@ -92,6 +93,7 @@ async function freeUsername(account) {
 }
 
 const accessSchema = z.object({
+  photoUrl: v.text(1000),
   name: v.text(120),
   username: z
     .string()
@@ -106,6 +108,7 @@ const accessSchema = z.object({
   active: z.boolean().default(true),
 });
 const lessonSchema = z.object({
+  groupId: v.text(100),
   courseId: v.required(80),
   title: v.required(200),
   kind: z.enum(LESSON_KINDS).default("lesson"),
@@ -133,6 +136,7 @@ const gradeSchema = z.object({
   published: z.boolean().default(true),
 });
 const announcementSchema = z.object({
+  groupId: v.text(100),
   title: v.required(200),
   body: v.text(5000),
   courseId: v.text(80),
@@ -143,6 +147,7 @@ const announcementSchema = z.object({
 
 export function createStudentsAdminRouter() {
   const router = Router();
+  mountCardAdmin(router);
   const anySection = (req, res, next) =>
     canModule(req.admin, "eleves")
       ? next()

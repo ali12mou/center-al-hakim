@@ -2,6 +2,9 @@
 // l’administration et le portail des agents les affichent.
 export const PROSPECT_STATUS = {
   new: "Nouveau",
+  to_contact: "À contacter",
+  considering: "En réflexion",
+  preregistered: "Préinscrit",
   interested: "Intéressé",
   following: "En cours de suivi",
   visit: "Visitera le centre",
@@ -25,11 +28,12 @@ export const PROSPECT_SOURCES = {
   referral: "Recommandation",
   event: "Salon / événement",
   phone: "Appel entrant",
+  whatsapp: "WhatsApp",
   website: "Site web",
   other: "Autre",
 };
 // Prospects encore « en cours » : comptés dans les relances à effectuer.
-export const OPEN_STATUSES = ["new", "interested", "following", "visit", "satisfied"];
+export const OPEN_STATUSES = ["new", "to_contact", "considering", "preregistered", "interested", "following", "visit", "satisfied"];
 // Prospects dont l’intérêt est confirmé.
 export const INTERESTED_STATUSES = ["interested", "following", "visit", "satisfied"];
 

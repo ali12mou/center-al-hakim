@@ -24,6 +24,7 @@ const studentUserSchema = new mongoose.Schema(
     // Dossiers financiers (fin_student_accounts) du student : une ligne par formation.
     accountIds: { type: [ref("StudentAccount")], default: [] },
     phone: { ...text, maxlength: 30, default: "" },
+    photoUrl: { ...text, maxlength: 1000, default: "" },
     email: { ...text, lowercase: true, maxlength: 254, default: "" },
     active: { type: Boolean, default: true },
     mustChangePassword: { type: Boolean, default: true },
@@ -52,6 +53,7 @@ studentSessionSchema.index({ userId: 1, createdAt: -1 });
 export const LESSON_KINDS = ["lesson", "document", "video", "link"];
 const lessonSchema = new mongoose.Schema(
   {
+    groupId: { ...text, default: "" },
     courseId: { ...text, required: true },
     title: { ...text, required: true, maxlength: 200 },
     kind: { type: String, enum: LESSON_KINDS, default: "lesson" },
@@ -105,6 +107,7 @@ gradeSchema.index({ courseId: 1, date: -1 });
 
 const announcementSchema = new mongoose.Schema(
   {
+    groupId: { ...text, default: "" },
     title: { ...text, required: true, maxlength: 200 },
     body: { ...text, maxlength: 5000, default: "" },
     // Vide : tous les students ; sinon les students de cette formation.

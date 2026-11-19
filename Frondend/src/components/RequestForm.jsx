@@ -98,6 +98,7 @@ export default function RequestForm({
               <button
                 type="button"
                 className={kind === value ? "selected" : ""}
+                aria-pressed={kind === value}
                 key={value}
                 onClick={() => {
                   setKind(value);

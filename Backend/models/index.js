@@ -29,6 +29,7 @@ request.index({ createdAt: -1, status: 1 });
 const course = new mongoose.Schema(
   {
     id: { type: String, required: true, unique: true },
+    courseType: { type: String, enum: ['formation','competence'], default: 'formation' },
     department: {
       type: String,
       required: true,

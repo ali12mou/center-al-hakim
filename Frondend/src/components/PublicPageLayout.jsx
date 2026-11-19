@@ -85,7 +85,7 @@ export default function PublicPageLayout({
     <>
       <Header centre={data.centre} navigation={data.content.navigation} />
       <PublicNav />
-      <main id="contenu">
+      <main id="contenu" className={pathname.startsWith("/blog") ? "blog-page" : undefined}>
         <div className={background ? "page-intro has-image" : "page-intro"}>
           {background && (
             <img
@@ -109,6 +109,7 @@ export default function PublicPageLayout({
         {children}
       </main>
       <Footer
+        campaigns={(data.portal?.publications || []).filter(item=>item.placement==='footer')}
         centre={data.centre}
         departments={data.departments}
         onPrivacy={privacy}

@@ -116,6 +116,7 @@ export default function ResourceEditor({
     }
   }
   function renderField(field) {
+    if (field.type === "choices") return <fieldset key={field.key} className="admin-full"><legend>{field.label}</legend>{field.options.map(([value,label])=><label key={value} style={{display:'flex',gap:10,alignItems:'center',marginBottom:10}}><input type="checkbox" checked={(values[field.key]||[]).includes(value)} onChange={event=>set(field.key,event.target.checked?[...(values[field.key]||[]),value]:(values[field.key]||[]).filter(item=>item!==value))} />{label}</label>)}</fieldset>;
     if (field.type === "questions")
       return (
         <div key={field.key} className="admin-full">
@@ -204,11 +205,7 @@ export default function ResourceEditor({
             {field.type === "course" ? (
               <>
                 <option value="">Non précisé</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
+                {[["formation","Formations"],["competence","Compétences"]].map(([type,title])=><optgroup key={type} label={title}>{courses.filter(course=>(course.courseType||'formation')===type).map(course=><option key={course.id} value={course.id}>{course.title}</option>)}</optgroup>)}
               </>
             ) : (
               field.options.map(([value, label]) => (

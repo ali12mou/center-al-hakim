@@ -5,6 +5,7 @@ import PublicPageLayout, {
 import { CentreAbout, Departments } from "./Centre.jsx";
 import Partners from "../components/Partners.jsx";
 import LatestInformations from "../components/LatestInformations.jsx";
+import CentreLocation from "../components/CentreLocation.jsx";
 import { PracticalInfo, PageCta } from "../components/PageBlocks.jsx";
 
 export default function CentrePage() {
@@ -20,12 +21,13 @@ export default function CentrePage() {
     >
       {data && (
         <>
-          <CentreAbout about={data.content.about} contactHref="/contact" />
+          <CentreAbout about={data.content.about} slides={data.portal?.presentations} contactHref="/contact" />
           <Departments
             departments={data.departments}
             onDepartment={(id) => navigate(`/formations?pole=${id}`)}
           />
           <PracticalInfo centre={data.centre} />
+          <CentreLocation centre={data.centre}/>
           <Partners items={data.portal?.partners || []} />
           <LatestInformations items={data.portal?.informations} />
           <PageCta

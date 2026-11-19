@@ -47,6 +47,25 @@ const contentFields = {
 };
 const strings = z.array(z.string().trim().min(1).max(500)).max(30).default([]);
 export const contentSchemas = {
+  publications: z.object({
+    placement:z.enum(['banner','footer']).default('banner'),
+    ...contentFields,
+    audiences: z.array(z.enum(["public", "student", "marketing"])).min(1),
+    courseId: z.string().max(80).default(""), groupId: z.string().max(100).default(""),
+    startsAt: z.string().regex(/^$|^\d{4}-\d{2}-\d{2}$/).default(""),
+    endsAt: z.string().regex(/^$|^\d{4}-\d{2}-\d{2}$/).default(""),
+    archived: z.boolean().default(false), buttonLabel: z.string().max(60).default(""), buttonLink: safeUrl,
+    order: z.coerce.number().int().min(0).max(99).default(1),
+  }).strict(),
+  presentations: z.object({
+    ...contentFields,
+    eyebrow: z.string().trim().max(120).default(""),
+    accent: z.string().trim().max(200).default(""),
+    values: strings,
+    buttonLabel: z.string().trim().max(60).default(""),
+    buttonLink: safeUrl,
+    order: z.coerce.number().int().min(0).max(99).default(1),
+  }).strict(),
   competences: z
     .object({
       ...contentFields,
@@ -63,6 +82,7 @@ export const contentSchemas = {
   blog: z
     .object({
       ...contentFields,
+      videoUrl: safeUrl,
       author: z.string().max(100).default("AL-HAKIM CENTER"),
       category: z.string().max(80).default("Actualités"),
     })
@@ -129,6 +149,7 @@ export const contentSchemas = {
     .strict(),
   courses: z
     .object({
+      courseType:z.enum(['formation','competence']).default('formation'),
       id: z
         .string()
         .trim()

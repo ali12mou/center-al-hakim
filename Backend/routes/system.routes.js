@@ -533,7 +533,7 @@ export function createLookupRouter() {
       : res.status(403).json({ error: "Accès non autorisé.", forbidden: true });
   const hrOrFinance = (user) => canModule(user, "rh") || canModule(user, "finance");
   router.get("/courses", wrap(async (_req, res) => {
-    res.json({ items: await Course.find().select("id title department published").sort({ title: 1 }).lean() });
+    res.json({ items: await Course.find().select("id title department published courseType").sort({ title: 1 }).lean() });
   }));
   router.get("/staff", needs(hrOrFinance), wrap(async (req, res) => {
     const filter = {};

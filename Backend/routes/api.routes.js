@@ -11,9 +11,13 @@ import {
 import { submitAssessment } from "../controllers/assessment.controller.js";
 import { SiteVisit } from "../models/system.models.js";
 import { today } from "../services/dates.js";
+import { mountPublicCard } from "./portal.routes.js";
+import { getPublicCentre } from "../services/site.service.js";
+import { siteDefaults } from "../data/siteSettings.js";
 
 export function createApiRouter(dependencies) {
   const router = Router();
+  mountPublicCard(router);
   const courses = createCoursesController(dependencies);
   const createRequest = createRequestController(dependencies);
   const requestLimit = rateLimit({
@@ -32,7 +36,7 @@ export function createApiRouter(dependencies) {
       registrationsAvailable: dependencies.isDatabaseReady(),
     }),
   );
-  router.get("/centre", (_req, res) => res.json({ centre, departments }));
+  router.get("/centre", async (_req,res,next)=>{try{res.json({centre:dependencies.isDatabaseReady()?await getPublicCentre():{...centre,...siteDefaults},departments});}catch(error){next(error);}});
   router.get("/content", (_req, res) => res.json(siteContent));
   router.get("/pages", async (_req, res, next) => {
     try {

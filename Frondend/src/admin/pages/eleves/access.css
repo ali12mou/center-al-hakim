@@ -1,0 +1,41 @@
+.student-access-page .admin-page-heading { margin-bottom:28px; }
+.student-access-page .admin-page-heading > div > p { max-width:850px; font-size:14px; line-height:1.8; }
+.student-access-page .app-share-banner { display:flex; align-items:center; gap:20px; padding:26px; margin-bottom:22px; background:var(--a-surface,white); border:1px solid var(--a-border); border-radius:16px; }
+.student-app-icon { display:flex; align-items:center; justify-content:center; width:58px; height:58px; flex-shrink:0; color:var(--a-navy); background:var(--a-blue-soft,#eaf1fb); border-radius:16px; }
+.student-access-page .app-share-banner > span:last-child { min-width:0; }
+.student-app-kicker { display:block; color:var(--a-muted); font-size:9px; font-weight:750; letter-spacing:1.5px; margin-bottom:6px; }
+.student-access-page .app-share-banner b { display:block; overflow-wrap:anywhere; color:var(--a-heading,var(--a-navy)); font-size:17px; }
+.student-access-page .app-share-banner small { font-size:11px; line-height:1.8; color:var(--a-muted); margin-top:7px; }
+.student-access-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-bottom:30px; }
+.student-access-steps > div { display:grid; grid-template-columns:auto 1fr; column-gap:12px; padding:18px 20px; border:1px solid var(--a-border); border-radius:12px; background:var(--a-surface,white); }
+.student-access-steps > div > span { grid-row:span 2; font-family:Manrope,sans-serif; font-size:22px; font-weight:750; color:var(--a-muted); opacity:.6; }
+.student-access-steps strong { font-size:12px; color:var(--a-heading); }
+.student-access-steps small { font-size:10px; margin-top:4px; color:var(--a-muted); }
+.student-access-page .admin-table-panel { border-radius:14px; overflow:hidden; }
+.dialog.student-credentials { width:min(640px,calc(100vw - 32px)); border:1px solid var(--a-border); border-radius:20px; }
+.student-credentials .dialog-inner { padding:34px !important; }
+.student-credentials .dialog-inner > h2 { font-size:27px; line-height:1.25; letter-spacing:-1px; padding-right:22px; margin-bottom:14px; }
+.student-credentials .credentials-ready { display:inline-flex; align-items:center; gap:7px; color:var(--a-green,#157c62); background:var(--a-green-soft,#e9f7f1); font-size:11px; font-weight:650; padding:7px 10px; border-radius:30px; margin-bottom:18px; }
+.student-credentials .editor-intro { color:var(--a-ink-2); font-size:13px; line-height:1.85; margin-bottom:24px; }
+.student-credentials-grid { display:grid; gap:12px; margin:0; }
+.student-credentials-grid > div { min-width:0; border:1px solid var(--a-border); background:var(--a-surface-soft,#f7f9fc); border-radius:11px; padding:16px 18px; }
+.student-credentials-grid dt { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:650; color:var(--a-muted); margin-bottom:8px; }
+.student-credentials-grid dd { min-width:0; margin:0; font-weight:700; font-size:16px; line-height:1.65; overflow-wrap:anywhere; color:var(--a-heading,#193964); }
+.student-credentials-grid dd code { font-family:ui-monospace,Consolas,monospace; font-size:17px; letter-spacing:.4px; background:none; padding:0; white-space:normal; overflow-wrap:anywhere; }
+.student-credentials-grid > div:last-child { background:var(--a-blue-soft,#eaf1fb); border-color:var(--a-border); }
+.student-credentials-grid a { text-decoration:underline; text-decoration-color:#19396440; text-underline-offset:4px; }
+.credentials-security { display:flex; align-items:flex-start; gap:8px; font-size:11px; color:var(--a-muted); margin:18px 0 0; line-height:1.7; }
+.credentials-security svg { margin-top:2px; }
+.dialog.student-credentials .admin-editor-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin:26px 0 0; padding:20px 0 0; position:static; background:transparent; }
+.student-credentials .admin-editor-actions .button { min-width:0; min-height:45px; padding:11px 14px; font-size:11px; gap:7px; border-radius:9px; line-height:1.5; }
+.credentials-copy-error { font-size:12px; color:var(--a-red,#b52b49); }
+@media(max-width:950px) { .student-access-steps { grid-template-columns:1fr; gap:10px; } }
+@media(max-width:600px) {
+  .student-access-page .app-share-banner { padding:20px; gap:14px; align-items:flex-start; }
+  .student-app-icon { width:44px; height:44px; border-radius:12px; }
+  .student-access-page .app-share-banner b { font-size:14px; }
+  .student-credentials .dialog-inner { padding:26px 20px !important; }
+  .student-credentials .dialog-inner > h2 { font-size:23px; }
+  .dialog.student-credentials .admin-editor-actions { grid-template-columns:1fr; }
+  .student-credentials-grid dd, .student-credentials-grid dd code { font-size:15px; }
+}

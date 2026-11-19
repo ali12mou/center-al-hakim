@@ -18,15 +18,17 @@ export default function Contact({
   onPrivacy,
 }) {
   return (
-    <section id="contact" className="section contact section-anchor">
-      <div className="container contact-grid">
+    <section id="contact" className="section contact contact-redesign section-anchor">
+      <div className="container">
+        <div className="contact-section-heading">
+          <div><span className="eyebrow">DONNONS UNE SUITE À VOS AMBITIONS</span><h2>Votre prochaine étape<br />commence par un échange<span>.</span></h2></div>
+          <p>Une formation, un projet d’équipe ou une simple question : nous sommes à votre écoute.</p>
+        </div>
+        <div className="contact-grid">
         <div className="contact-info">
-          <span className="eyebrow">UNE QUESTION ? UN PROJET ?</span>
-          <h2>
-            Parlons de
-            <br />
-            <span>votre avenir.</span>
-          </h2>
+          <span className="contact-panel-icon"><MessageCircle size={26} strokeWidth={1.5} /></span>
+          <span className="eyebrow">RESTONS EN CONTACT</span>
+          <h3>Parlons de votre projet.</h3>
           <p>
             Vous hésitez entre deux parcours ou souhaitez en savoir plus ?
             Échangeons sur vos objectifs.
@@ -97,6 +99,7 @@ export default function Contact({
           request={request}
           onPrivacy={onPrivacy}
         />
+        </div>
       </div>
     </section>
   );

@@ -182,6 +182,7 @@ const skillSchema = new mongoose.Schema(
 const articleSchema = new mongoose.Schema(
   {
     ...publishFields,
+    videoUrl: { ...text, maxlength: 1000, default: "" },
     author: { ...text, default: "AL-HAKIM CENTER" },
     category: { ...text, default: "Actualités" },
   },
@@ -319,6 +320,9 @@ export const AssessmentAttempt = mongoose.model(
 );
 export const Partner = mongoose.model("Partner", partnerSchema, "partners");
 export const HomeSlide = mongoose.model("HomeSlide", slideSchema, "home_slides");
+const presentationSchema = slideSchema.clone();
+presentationSchema.add({ values: { type: [String], default: [] } });
+export const CentrePresentation = mongoose.model("CentrePresentation", presentationSchema, "centre_presentations");
 export const PlatformSetting = mongoose.model(
   "PlatformSetting",
   new mongoose.Schema({ _id: String, initializedAt: Date }),
@@ -342,5 +346,6 @@ export const platformModels = [
   AssessmentAttempt,
   Partner,
   HomeSlide,
+  CentrePresentation,
   PlatformSetting,
 ];

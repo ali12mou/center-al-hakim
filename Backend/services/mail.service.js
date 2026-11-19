@@ -1,36 +1,26 @@
 import nodemailer from "nodemailer";
+import { smtpOptions } from "../config/runtime.js";
 
 // Envoi d’e-mails par SMTP (Gmail, Outlook, hébergeur…), configuré dans Backend/.env.
 // Un identifiant sans mot de passe compte comme « non configuré ».
 export const mailConfigured = () =>
   Boolean(
-    process.env.SMTP_HOST &&
-      process.env.SMTP_FROM &&
-      (!process.env.SMTP_USER || process.env.SMTP_PASSWORD),
+    process.env.SMTP_HOST?.trim() &&
+      process.env.SMTP_FROM?.trim() &&
+      (!process.env.SMTP_USER?.trim() || process.env.SMTP_PASSWORD),
   );
 
 let transport;
 function getTransport() {
-  transport ||= nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === "true",
-    ...(process.env.SMTP_USER
-      ? {
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASSWORD,
-          },
-        }
-      : {}),
-    connectionTimeout: 10000,
-    socketTimeout: 15000,
-  });
+  transport ||= nodemailer.createTransport(smtpOptions());
   return transport;
 }
 
+// Verifies DNS, connection, TLS and authentication without sending an OTP.
+export const verifySmtp = () => getTransport().verify();
+
 export const sendMail = (message) =>
-  getTransport().sendMail({ from: process.env.SMTP_FROM, ...message });
+  getTransport().sendMail({ from: process.env.SMTP_FROM?.trim(), ...message });
 
 const escapeHtml = (value = "") =>
   String(value).replace(

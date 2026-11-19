@@ -30,6 +30,8 @@ import { getSettings } from "../services/settings.service.js";
 import { passwordProblem } from "../validators/password-policy.js";
 import { PRIVATE_DIR } from "../controllers/upload.controller.js";
 import { httpError, sendError, validId } from "../services/crud.js";
+import { mountStudentPortal } from "./portal.routes.js";
+import { courseScope } from "../services/portal.service.js";
 
 // Application des students : connexion et lecture de LEURS données uniquement.
 // Le cookie « ah_student » n’est envoyé qu’aux adresses /api/student : il
@@ -250,6 +252,7 @@ export function createStudentRouter(isDatabaseReady) {
   );
 
   router.use(requireStudent);
+  mountStudentPortal(router);
 
   router.post(
     "/auth/logout",
@@ -314,6 +317,7 @@ export function createStudentRouter(isDatabaseReady) {
             reference: account.reference,
             courseId: account.courseId,
             courseTitle: account.courseTitle,
+            groupId: account.groupId || "",
             course: courses.find((course) => course.id === account.courseId) || null,
             startDate: account.startDate,
             status: account.status,
@@ -358,8 +362,8 @@ export function createStudentRouter(isDatabaseReady) {
   router.get(
     "/lessons",
     wrap(async (req, res) => {
-      const courseIds = courseIdsOf(await myAccounts(req.student));
-      const lessons = await Lesson.find({ courseId: { $in: courseIds }, published: true })
+      const accounts = await myAccounts(req.student);
+      const lessons = await Lesson.find({ ...courseScope(accounts), published: true })
         .select("courseId title kind description body fileUrl link date order createdAt")
         .sort({ courseId: 1, order: 1, date: -1, createdAt: -1 })
         .lean();
@@ -378,10 +382,10 @@ export function createStudentRouter(isDatabaseReady) {
     "/lessons/:id/file",
     wrap(async (req, res) => {
       if (!validId(req.params.id)) throw httpError(404, "Document introuvable.");
-      const courseIds = courseIdsOf(await myAccounts(req.student));
+      const accounts = await myAccounts(req.student);
       const lesson = await Lesson.findOne({
         _id: req.params.id,
-        courseId: { $in: courseIds },
+        ...courseScope(accounts),
         published: true,
       }).lean();
       const name = lesson?.fileUrl?.match(/^\/api\/admin\/files\/([0-9a-f-]{36}\.(pdf|png|jpg|gif|webp))$/)?.[1];
@@ -444,10 +448,10 @@ export function createStudentRouter(isDatabaseReady) {
   router.get(
     "/announcements",
     wrap(async (req, res) => {
-      const courseIds = courseIdsOf(await myAccounts(req.student));
+      const accounts = await myAccounts(req.student);
       const items = await Announcement.find({
         published: true,
-        courseId: { $in: ["", ...courseIds] },
+        ...courseScope(accounts,true),
       })
         .select("title body courseId date pinned")
         .sort({ pinned: -1, date: -1, createdAt: -1 })

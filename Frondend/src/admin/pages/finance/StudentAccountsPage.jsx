@@ -130,6 +130,7 @@ const fields = (record) => [
     },
   },
   { key: "courseId", label: "Formation", type: "lookup", lookup: "courses", valueKey: "id", placeholder: "— Non précisée —" },
+  { key:"groupId",label:"Groupe (identifiant)",hint:"Utilisez le même identifiant pour les cours, séances et annonces ciblées." },
   { key: "baseAmount", label: "Montant de la formation", type: "money", required: true },
   { key: "registrationFee", label: "Frais d’inscription", type: "money" },
   { key: "discountId", label: "Remise du catalogue", type: "lookup", lookup: "discounts", placeholder: "— Aucune —", optionLabel: (item) => `${item.name} (${item.kind === "percent" ? `${item.value} %` : money(item.value)})` },

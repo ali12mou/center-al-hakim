@@ -9,6 +9,7 @@ import PasswordChangeScreen from "./components/PasswordChangeScreen.jsx";
 import { Forbidden } from "./components/ui.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import ResourcePage from "./pages/ResourcePage.jsx";
+import SiteSettingsPage from "./pages/SiteSettingsPage.jsx";
 import AssessmentsAdminPage from "./pages/AssessmentsAdminPage.jsx";
 import SecurityPage from "./pages/SecurityPage.jsx";
 import OverviewPage from "./pages/system/OverviewPage.jsx";
@@ -149,6 +150,7 @@ function AdminShell({ auth, badges, collapsed, onToggle, onLogout, onSessionRene
 
             {/* Gestion du centre */}
             <Route path="centre" element={<Guard section="centre.dashboard"><DashboardPage user={user} /></Guard>} />
+            <Route path="site-settings" element={<Guard section="centre.settings"><SiteSettingsPage /></Guard>} />
             <Route path="marketing/agents" element={<Guard section="centre.marketingAgents"><AgentsPage /></Guard>} />
             <Route path="marketing/prospects" element={<Guard section="centre.prospects"><ProspectsPage /></Guard>} />
             {Object.keys(sections).map((resource) => (

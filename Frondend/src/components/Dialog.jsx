@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 // `media` : image ou vidéo affichée sur toute la largeur, au-dessus du titre.
@@ -8,6 +9,7 @@ export default function Dialog({
   onClose,
   className = "",
   media = null,
+  portal = false,
 }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function Dialog({
       document.body.style.overflow = before;
     };
   }, []);
-  return (
+  const content = (
     <dialog
       ref={ref}
       className={`dialog ${className}`}
@@ -48,4 +50,5 @@ export default function Dialog({
       </div>
     </dialog>
   );
+  return portal ? createPortal(content, document.body) : content;
 }

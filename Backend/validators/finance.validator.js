@@ -81,6 +81,7 @@ const installment = z.object({
   amount: v.positive,
 });
 export const studentAccountSchema = z.object({
+  groupId: v.text(100),
   registrationId: v.optionalId,
   studentName: v.required(120),
   phone: v.text(30),

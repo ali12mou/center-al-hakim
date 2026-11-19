@@ -10,6 +10,7 @@ import { marketingModels } from "./models/marketing.models.js";
 import { Course, Request } from "./models/index.js";
 import { seedPlatform } from "./services/platform.service.js";
 import { seedFinance } from "./services/finance.service.js";
+import { portalModels } from "./models/portal.models.js";
 
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
 
@@ -32,7 +33,7 @@ if (process.env.MONGODB_URI) {
       serverSelectionTimeoutMS: 5000,
     });
     await Promise.all(
-      [...platformModels, ...hrModels, ...financeModels, ...systemModels, ...marketingModels, Course, Request].map(
+      [...platformModels, ...hrModels, ...financeModels, ...systemModels, ...marketingModels, ...portalModels, Course, Request].map(
         (model) => model.init(),
       ),
     );

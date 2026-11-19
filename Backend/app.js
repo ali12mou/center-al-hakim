@@ -12,18 +12,14 @@ import { createAdminRouter } from "./routes/admin.routes.js";
 import { createStudentRouter } from "./routes/student.routes.js";
 import { createMarketingRouter } from "./routes/marketing.routes.js";
 import { UPLOAD_DIR } from "./controllers/upload.controller.js";
+import { proxySetting } from "./config/runtime.js";
 
 export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
   const app = express();
   app.disable("x-powered-by");
   // Derrière un proxy (Nginx, hébergeur), TRUST_PROXY donne la vraie adresse IP
   // au limiteur de tentatives et au journal de sécurité.
-  const trustProxy = process.env.TRUST_PROXY;
-  if (trustProxy)
-    app.set(
-      "trust proxy",
-      /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy,
-    );
+  app.set("trust proxy", proxySetting());
   const ready = isDatabaseReady || (() => mongoose.connection.readyState === 1);
   app.use(
     helmet({
@@ -38,6 +34,7 @@ export function createApp({ saveRequest, isDatabaseReady, loadCourses } = {}) {
           // Vidéos du diaporama : importées (/uploads) ou à une adresse https.
           mediaSrc: ["'self'", "https:"],
           fontSrc: ["'self'"],
+          frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com"],
           // Envoi des mesures Google Analytics (liste officielle de Google pour
           // GA4 : *.google.com couvre analytics.google.com et www.google.com).
           connectSrc: [

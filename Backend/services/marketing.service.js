@@ -7,6 +7,7 @@ import {
   MarketingActivity,
 } from "../models/marketing.models.js";
 import { Registration } from "../models/platform.models.js";
+import { PortalPublication } from "../models/portal.models.js";
 import { Course } from "../models/index.js";
 import { nextNumber } from "../models/system.models.js";
 import {
@@ -49,9 +50,13 @@ export const prospectSchema = z.object({
   source: z.enum(Object.keys(PROSPECT_SOURCES)).default("field"),
   notes: v.text(2000),
   consent: z.boolean().default(false),
+  consentChannels: z.array(z.enum(["phone","whatsapp","email"])).default([]),
+  campaignId: z.union([z.string().regex(/^[a-f\d]{24}$/i),z.literal("")]).optional(),
+  nextFollowUpAt: z.union([z.string().datetime({offset:true}),z.literal("")]).optional(),
   nextFollowUp: v.optionalDay,
 });
 export const statusSchema = z.object({
+  nextFollowUpAt: z.union([z.string().datetime({offset:true}),z.literal("")]).optional(),
   status: z.enum(Object.keys(PROSPECT_STATUS)),
   note: v.text(1000),
   nextFollowUp: v.optionalDay,
@@ -102,9 +107,15 @@ export async function logActivity(agentId, action, req, { prospectId, details = 
 }
 
 export async function createProspect(data, { by, agent, reveal = true }) {
+  if(by.kind === "agent" && data.status === "enrolled") throw httpError(403,"Seule l’administration peut confirmer une inscription.");
+  if(data.campaignId && !(await PortalPublication.exists({_id:data.campaignId,published:true,archived:{$ne:true},audiences:"marketing"}))) throw httpError(400,"Campagne indisponible.");
   await assertNoDuplicate(data, undefined, reveal);
   const prospect = await MarketingProspect.create({
     ...data,
+    campaignId: data.campaignId || undefined,
+    nextFollowUpAt: data.nextFollowUpAt || undefined,
+    consentAt: data.consent ? new Date() : undefined,
+    enrollmentValidatedAt: by.kind === "admin" && data.status === "enrolled" ? new Date() : undefined,
     reference: await nextNumber("PRO"),
     phoneKey: phoneKey(data.phone),
     courseTitle: await courseTitle(data.courseId),
@@ -134,6 +145,9 @@ export async function updateProspect(prospect, data, reveal = true) {
   if (data.courseId && data.courseId !== prospect.courseId)
     prospect.courseTitle = await courseTitle(data.courseId);
   const { status: _ignored, ...rest } = data;
+  if (rest.campaignId === "") rest.campaignId = undefined;
+  if (rest.nextFollowUpAt === "") rest.nextFollowUpAt = undefined;
+  if (rest.consent !== undefined && rest.consent !== prospect.consent) prospect.consentAt = new Date();
   Object.assign(prospect, rest);
   if (data.phone) prospect.phoneKey = phoneKey(data.phone);
   await prospect.save();
@@ -141,7 +155,10 @@ export async function updateProspect(prospect, data, reveal = true) {
 }
 
 // Chaque changement de statut est daté et historisé avec son auteur.
-export async function changeStatus(prospect, { status, note, nextFollowUp }, by) {
+export async function changeStatus(prospect, { status, note, nextFollowUp, nextFollowUpAt }, by) {
+  if(by.kind === "agent" && status === "enrolled") throw httpError(403,"Seule l’administration peut confirmer une inscription.");
+  if(status === "enrolled" && by.kind === "admin") prospect.enrollmentValidatedAt = new Date();
+  if(nextFollowUpAt !== undefined) prospect.nextFollowUpAt = nextFollowUpAt || undefined;
   const from = prospect.status;
   if (from === status && !note && nextFollowUp === undefined)
     throw httpError(400, "Choisissez un autre statut ou ajoutez un commentaire.");
@@ -216,6 +233,10 @@ export const publicProspect = (item) => ({
   source: item.source,
   notes: item.notes,
   consent: item.consent,
+  consentAt: item.consentAt,
+  consentChannels: item.consentChannels || [],
+  campaignId: item.campaignId,
+  nextFollowUpAt: item.nextFollowUpAt,
   nextFollowUp: item.nextFollowUp || "",
   agentId: item.agentId || null,
   agentName: item.agentName,
@@ -236,12 +257,13 @@ export function prospectFilter(query, base = {}) {
   if (PROSPECT_STATUS[query.status]) filter.status = query.status;
   if (query.status === "followup") {
     filter.status = { $in: OPEN_STATUSES };
-    filter.nextFollowUp = { $lte: today() };
+    filter.$and = [{ $or: [{ nextFollowUpAt: { $lte: new Date() } }, { nextFollowUpAt: null, nextFollowUp: { $lte: today() } }, { nextFollowUpAt: null, nextFollowUp: null, status: "new" }] }];
   }
   if (PROSPECT_SOURCES[query.source]) filter.source = query.source;
   if (typeof query.courseId === "string" && query.courseId) filter.courseId = query.courseId.slice(0, 80);
   if (!base.agentId && mongoose.isValidObjectId(query.agentId)) filter.agentId = new mongoose.Types.ObjectId(query.agentId);
-  if (query.agentId === "none") filter.agentId = null;
+  if (!base.agentId && query.agentId === "none") filter.agentId = null;
+  if (mongoose.isValidObjectId(query.campaignId)) filter.campaignId = new mongoose.Types.ObjectId(query.campaignId);
   const range = {};
   if (/^\d{4}-\d{2}-\d{2}$/.test(query.from || "")) range.$gte = new Date(`${query.from}T00:00:00+03:00`);
   if (/^\d{4}-\d{2}-\d{2}$/.test(query.to || "")) range.$lte = new Date(`${query.to}T23:59:59.999+03:00`);
@@ -265,12 +287,12 @@ export async function listProspects(query, base) {
 export async function prospectStats(query, base = {}) {
   const filter = prospectFilter({ ...query, status: "" , q: "" }, base);
   const day = today();
-  const [byStatus, followUps, byAgent] = await Promise.all([
+  const [byStatus, followUps, byAgent, validatedEnrollments] = await Promise.all([
     MarketingProspect.aggregate([{ $match: filter }, { $group: { _id: "$status", count: { $sum: 1 } } }]),
     MarketingProspect.countDocuments({
       ...filter,
       status: { $in: OPEN_STATUSES },
-      $or: [{ nextFollowUp: { $lte: day } }, { status: "new", nextFollowUp: null }],
+      $or: [{ nextFollowUpAt: { $lte: new Date() } }, { nextFollowUpAt: null, nextFollowUp: { $lte: day } }, { status: "new", nextFollowUpAt: null, nextFollowUp: null }],
     }),
     base.agentId
       ? []
@@ -282,12 +304,13 @@ export async function prospectStats(query, base = {}) {
               name: { $last: "$agentName" },
               total: { $sum: 1 },
               interested: { $sum: { $cond: [{ $in: ["$status", INTERESTED_STATUSES] }, 1, 0] } },
-              enrolled: { $sum: { $cond: [{ $eq: ["$status", "enrolled"] }, 1, 0] } },
+              enrolled: { $sum: { $cond: [{ $and: [{ $eq: ["$status", "enrolled"] }, { $ne: [{ $ifNull: ["$enrollmentValidatedAt", null] }, null] }] }, 1, 0] } },
               lost: { $sum: { $cond: [{ $eq: ["$status", "not_interested"] }, 1, 0] } },
             },
           },
           { $sort: { enrolled: -1, total: -1 } },
         ]),
+    MarketingProspect.countDocuments({ ...filter, status: "enrolled", enrollmentValidatedAt: { $ne: null } }),
   ]);
   const counts = Object.fromEntries(Object.keys(PROSPECT_STATUS).map((key) => [key, 0]));
   for (const row of byStatus) counts[row._id] = row.count;
@@ -297,8 +320,9 @@ export async function prospectStats(query, base = {}) {
   return {
     total,
     interested,
-    enrolled: counts.enrolled,
-    conversion: rate(counts.enrolled, total),
+    enrolled: validatedEnrollments,
+    conversion: rate(validatedEnrollments, total),
+    conversionMethod: "Inscriptions validées par l’administration / prospects collectés sur la période × 100.",
     followUps,
     byStatus: counts,
     byAgent: byAgent.map((row) => ({

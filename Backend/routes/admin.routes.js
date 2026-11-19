@@ -42,6 +42,7 @@ import { createSystemRouter, createLookupRouter } from "./system.routes.js";
 import { createStudentsAdminRouter } from "./students-admin.routes.js";
 import { createMarketingAdminRouter } from "./marketing-admin.routes.js";
 import { canModule, isSuperAdmin } from "../config/permissions.js";
+import { getPublicCentre, saveSiteSettings } from "../services/site.service.js";
 
 const limiter = (windowMinutes, limit, error) =>
   rateLimit({
@@ -111,6 +112,8 @@ export function createAdminRouter(isDatabaseReady) {
   router.post("/auth/forgot/verify", loginLimit, verifyResetCode);
   router.post("/auth/forgot/reset", passwordLimit, resetPassword);
   router.use(requireAdmin);
+  router.get('/site-settings',permit('centre.settings','view'),async(_req,res,next)=>{try{res.json({settings:await getPublicCentre()});}catch(error){next(error);}});
+  router.patch('/site-settings',permit('centre.settings','update'),async(req,res,next)=>{try{const result=await saveSiteSettings(req.body,req.admin);res.status(result.error?400:200).json(result);}catch(error){next(error);}});
   router.post("/auth/logout", logoutAdmin);
   router.post("/auth/password", passwordLimit, changePassword);
   router.get("/auth/sessions", listSessions);

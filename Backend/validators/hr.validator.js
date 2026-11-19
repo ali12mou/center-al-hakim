@@ -88,6 +88,7 @@ export const assignmentSchema = z.object({
   notes: v.text(1000),
 });
 export const planningSchema = z.object({
+  groupId: v.text(100),
   staffId: v.id,
   date: v.day,
   shift: z.enum(SHIFTS).default("matin"),

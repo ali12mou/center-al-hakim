@@ -1,4 +1,6 @@
 import { Printer } from "lucide-react";
+import { useEffect } from "react";
+import { documentName } from "../lib/documentName.js";
 import Dialog from "../../components/Dialog.jsx";
 import { useRemote } from "../hooks/useRemote.js";
 import { dayLabel, hours, money, monthLabel, PAY_TYPES, PAYMENT_METHODS, STATUS } from "../lib/format.js";
@@ -199,13 +201,23 @@ function Payslip({ item, issuer, currency }) {
 
 const DOCUMENTS = { receipt: Receipt, invoice: Invoice, payslip: Payslip };
 export default function PrintDocument({ kind, item, onClose }) {
+  useEffect(() => {
+    const previousTitle = document.title;
+    const updateTitle = () => { document.title = documentName(kind, item); };
+    updateTitle();
+    window.addEventListener("beforeprint", updateTitle);
+    return () => {
+      window.removeEventListener("beforeprint", updateTitle);
+      document.title = previousTitle;
+    };
+  }, [kind, item]);
   const { data: issuer } = useRemote("/lookups/issuer");
   const Document = DOCUMENTS[kind];
   const currency = issuer?.currency || "FDJ";
   return (
-    <Dialog title="Aperçu avant impression" onClose={onClose} className="admin-editor print-dialog">
+    <Dialog title="Aperçu avant impression" onClose={onClose} className={`admin-editor print-dialog${kind === "payslip" ? "" : " print-half-sheet"}`} portal>
       <div className="print-actions no-print">
-        <p>Utilisez « Imprimer » puis choisissez « Enregistrer au format PDF » pour obtenir le fichier.</p>
+        <p>{kind === "payslip" ? "Imprimez ou enregistrez votre document au format PDF." : "Format demi-feuille : A4 portrait, échelle 100 %. Désactivez les en-têtes et pieds de page du navigateur."}</p>
         <button className="button" onClick={() => window.print()}>
           <Printer size={16} /> Imprimer / PDF
         </button>

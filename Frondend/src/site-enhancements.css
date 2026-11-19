@@ -1,0 +1,42 @@
+.journey.section{padding-block:80px;background:var(--surface-soft,#f4f6fa);border-block:1px solid var(--border);}
+.journey.section>.container>.eyebrow{font-size:10px;font-weight:750;letter-spacing:1.8px;display:block;margin-bottom:15px;}
+.journey.section h2{font-size:clamp(29px,3vw,40px);letter-spacing:-1.2px;max-width:740px;}
+.journey.section .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:34px;}
+.journey.section .step{padding:28px;border:1px solid var(--border);border-radius:16px;background:var(--surface,white);}
+.journey.section .step::after{display:none;}
+.journey-step-top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:25px;}
+.journey-step-top>svg{color:var(--navy);}
+.journey.section .step-number{width:42px;height:42px;border-radius:12px;background:var(--tone-pink-bg,#fceaf0);border:0;font-size:13px;margin:0;}
+.journey.section .step h3{font-size:20px;line-height:1.4;margin-bottom:12px;}
+.journey.section .step p{font-size:15px;line-height:1.8;max-width:none;color:var(--muted);}
+.latest-blog{background:var(--surface-soft,#f5f7fa);padding-block:80px;}
+.latest-blog .section-heading h2{font-size:clamp(28px,3vw,40px);}
+.latest-blog .section-heading .eyebrow{font-size:10px;letter-spacing:1.7px;}
+.latest-blog .section-heading p{font-size:15px;}
+.latest-blog .section-heading .button{font-size:13px;border-radius:9px;flex-shrink:0;}
+.centre-location{background:var(--surface-soft,#f5f7fa);}
+.public-announcement{display:grid;grid-template-columns:1fr 1.15fr;border-radius:18px;overflow:hidden;background:var(--surface-soft,#f4f6fa);border:1px solid var(--border);}
+.public-announcement>div:first-child{background:var(--navy);min-height:280px;}
+.public-announcement img{width:100%;height:100%;object-fit:cover;}
+.public-announcement>div:last-child{padding:36px;}
+.public-announcement h2{font-size:32px;}
+.public-announcement p{font-size:15px;line-height:1.8;color:var(--muted);}
+.public-announcement-controls{display:flex;gap:12px;align-items:center;margin-top:20px;font-size:12px;}
+.public-announcement-controls button{display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface,white);border-radius:50%;width:34px;height:34px;}
+@media(max-width:650px){.public-announcement{grid-template-columns:1fr;}.public-announcement>div:last-child{padding:26px;}.public-announcement>div:first-child{min-height:180px;max-height:240px;}}
+.centre-map-panel{display:grid;grid-template-columns:1.3fr 1fr;border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--surface,white);}
+.centre-map{position:relative;min-height:420px;background:#e9eef4;}
+.centre-map iframe{width:100%;height:100%;min-height:420px;border:0;display:block;}
+.centre-map>span{position:absolute;bottom:16px;left:16px;right:16px;width:fit-content;padding:9px 12px;background:white;color:#4e5e73;border-radius:7px;font-size:10px;box-shadow:0 2px 10px #19396412;}
+.centre-map-info{padding:36px;display:flex;flex-direction:column;align-items:flex-start;gap:18px;}
+.centre-map-icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:var(--tone-pink-bg,#fceaf0);color:var(--accent,var(--pink));}
+.centre-map-info h3{font-size:22px;margin:0;}
+.centre-map-info p{font-size:15px;line-height:1.9;margin:0;color:var(--muted);}
+.centre-map-info a{display:flex;align-items:center;gap:10px;font-size:14px;overflow-wrap:anywhere;}
+.centre-map-info .button{font-size:12px;border-radius:9px;margin-block:2px 8px;}
+.centre-map-info small{font-size:12px;line-height:1.8;color:var(--muted);border-top:1px solid var(--border);padding-top:15px;}
+.partners-section .partners-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;}
+.partners-section .partner-card{padding:28px;border-radius:16px;max-width:420px;}
+.partners-section .partner-card p{font-size:15px;line-height:1.9;}
+@media(max-width:800px){.journey.section .steps{grid-template-columns:1fr;gap:16px;}.centre-map-panel{grid-template-columns:1fr;}.centre-map{min-height:320px;}.centre-map iframe{min-height:320px;}.centre-map-info{padding:28px;}}
+@media(max-width:650px){.journey.section,.latest-blog{padding-block:56px;}.journey.section .step{padding:24px;}.latest-blog .section-heading{flex-direction:column;align-items:flex-start;gap:20px;}.centre-map-info .button{white-space:normal;text-align:start;}}

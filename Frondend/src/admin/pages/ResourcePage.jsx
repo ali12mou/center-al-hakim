@@ -61,7 +61,7 @@ export default function ResourcePage({ resource }) {
   }, [resource, query, page, filter, version]);
   // Liste des formations accessible à tout compte connecté (pas seulement « Courses »).
   useEffect(() => {
-    if (config.person)
+    if (config.person || config.fields.some(field => field.type === "course"))
       adminApi("/lookups/courses")
         .then((value) => setCourses(value.items))
         .catch((failure) => setError(failure.message));
@@ -104,6 +104,7 @@ export default function ResourcePage({ resource }) {
       ]
     : [
         "Publication",
+        ...(["slides", "presentations"].includes(resource) ? ["Ordre"] : []),
         "Statut",
         "Date",
         ...(resource === "courses" ? ["Département"] : []),
@@ -129,7 +130,7 @@ export default function ResourcePage({ resource }) {
               onClick={() => setEditor({ record: null })}
             >
               <Plus size={17} />
-              {config.person ? "Ajouter une personne" : "Créer une publication"}
+              {config.person ? "Ajouter une personne" : resource==='courses' ? "Ajouter une compétence / formation" : "Créer une publication"}
             </button>
           )}
         </div>
@@ -261,6 +262,7 @@ export default function ResourcePage({ resource }) {
                           <small>{item.description}</small>
                         </div>
                       </td>
+                      {["slides", "presentations"].includes(resource) && <td>{item.order ?? 1}</td>}
                       <td>
                         <span
                           className={`admin-status ${item.published ? "status-confirmed" : "status-new"}`}

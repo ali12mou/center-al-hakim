@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Copy, KeyRound, MessageCircle, Power, Search, Smartphone, UserPlus } from "lucide-react";
+import { Check, Copy, KeyRound, Link as LinkIcon, MessageCircle, Power, Search, ShieldCheck, Smartphone, UserPlus } from "lucide-react";
+import "./access.css";
 import Dialog from "../../../components/Dialog.jsx";
 import ListPage from "../../components/ListPage.jsx";
 import { Alert, PageHeading, Panel, PersonCell, SimpleTable, StatusPill, Tabs } from "../../components/ui.jsx";
@@ -19,45 +20,51 @@ function whatsappNumber(phone = "") {
 }
 
 // Identifiants affichés une seule fois : le mot de passe n’est pas conservé en clair.
-function CredentialsDialog({ value, onClose }) {
+export function CredentialsDialog({ value, onClose }) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState("");
   const message = `Bonjour ${value.name},\nVotre espace student AL-HAKIM CENTER est prêt.\n\nApplication : ${appUrl()}\nIdentifiant : ${value.username}\nMot de passe provisoire : ${value.password}\n\nÀ la première connexion, choisissez votre mot de passe personnel. Vous pouvez ensuite installer l’application sur votre téléphone.`;
   const phone = whatsappNumber(value.phone);
   async function copy() {
     try {
+      setCopyError("");
       await navigator.clipboard.writeText(message);
       setCopied(true);
     } catch {
       setCopied(false);
+      setCopyError("La copie est indisponible. Sélectionnez les informations ci-dessous pour les copier manuellement.");
     }
   }
   return (
-    <Dialog title="Identifiants de l’application" onClose={onClose} className="admin-editor">
+    <Dialog title="L’accès de l’élève est prêt" onClose={onClose} className="admin-editor student-credentials">
+      <span className="credentials-ready"><ShieldCheck size={17} /> À remettre à l’élève</span>
       <p className="editor-intro">
         Remettez ces informations à <b>{value.name}</b>. Le mot de passe provisoire ne sera plus affiché : notez-le ou
-        envoyez-le maintenant. Le student devra le remplacer à sa première connexion.
+        envoyez-le maintenant. L’élève devra le remplacer à sa première connexion.
       </p>
-      <dl className="mini-facts credentials-facts">
+      <dl className="student-credentials-grid">
         <div>
-          <dt>Adresse de l’application</dt>
-          <dd>{appUrl()}</dd>
+          <dt><LinkIcon size={15} /> Adresse de connexion</dt>
+          <dd><a href={appUrl()} target="_blank" rel="noopener noreferrer">{appUrl()}</a></dd>
         </div>
         <div>
-          <dt>Identifiant</dt>
+          <dt><UserPlus size={15} /> Identifiant</dt>
           <dd>
             <code>{value.username}</code>
           </dd>
         </div>
         <div>
-          <dt>Mot de passe provisoire</dt>
+          <dt><KeyRound size={15} /> Mot de passe provisoire</dt>
           <dd>
             <code>{value.password}</code>
           </dd>
         </div>
       </dl>
+      <p className="credentials-security"><ShieldCheck size={16} /> Ce mot de passe devra être remplacé à la première connexion.</p>
+      {copyError && <p role="alert" className="credentials-copy-error">{copyError}</p>}
       <div className="admin-editor-actions">
         <button type="button" className="button button-outline" onClick={copy}>
-          <Copy size={16} /> {copied ? "Message copié" : "Copier le message"}
+          {copied ? <Check size={16} /> : <Copy size={16} />} {copied ? "Accès copiés" : "Copier les accès"}
         </button>
         {phone && (
           <a className="button" href={`https://wa.me/${phone}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">
@@ -137,25 +144,30 @@ export default function AccessPage() {
   const [credentials, setCredentials] = useState(null);
   const [version, setVersion] = useState(0);
   return (
-    <>
+    <div className="student-access-page">
       <PageHeading
-        kicker="ESPACE STUDENTS · APPLICATION MOBILE"
+        kicker="ESPACE ÉLÈVES · APPLICATION MOBILE"
         title="Accès à l’application"
         description="Chaque student se connecte à l’application avec un identifiant et un mot de passe donnés par le centre. Il ne voit que ses formations, ses cours, ses présences, ses notes et ses paiements — jamais l’administration."
       />
       <div className="app-share-banner">
-        <Smartphone size={20} />
+        <span className="student-app-icon"><Smartphone size={26} strokeWidth={1.5} /></span>
         <span>
-          Adresse à donner aux students : <b>{appUrl()}</b>
+          <span className="student-app-kicker">LEUR ESPACE PERSONNEL</span><b>{appUrl()}</b>
           <small>Sur Android, Chrome propose « Installer l’application ». Sur iPhone : Partager › « Sur l’écran d’accueil ».</small>
         </span>
+      </div>
+      <div className="student-access-steps" aria-label="Créer et remettre un accès">
+        <div><span>01</span><strong>Choisir l’élève</strong><small>Depuis les dossiers sans accès</small></div>
+        <div><span>02</span><strong>Créer ses identifiants</strong><small>Un accès personnel à ses informations</small></div>
+        <div><span>03</span><strong>Remettre les accès</strong><small>Copier le message ou ouvrir WhatsApp</small></div>
       </div>
       <Tabs
         value={tab}
         onChange={setTab}
         tabs={[
           ["access", "Accès créés"],
-          ["new", "Students sans accès"],
+          ["new", "Élèves sans accès"],
         ]}
       />
       {tab === "new" ? (
@@ -177,6 +189,11 @@ export default function AccessPage() {
           exportName="acces-eleves"
           deleteConfirm={(item) => `Supprimer l’accès de ${item.name} ? Son dossier, ses notes et ses paiements sont conservés.`}
           actions={(item, ctx) => [
+            admin.can("eleves.access", "update") && {
+              icon: ShieldCheck,
+              label: "Révoquer la carte étudiant",
+              onClick: () => { if(window.confirm(`Révoquer la carte de ${item.name} ? Le QR code signalera la révocation.`)) ctx.run(()=>adminApi(`/eleves/access/${item._id}/card/revoke`,{method:'POST',body:{}}),'Carte étudiant révoquée.'); },
+            },
             admin.can("eleves.access", "update") && {
               icon: KeyRound,
               label: "Nouveau mot de passe provisoire",
@@ -234,12 +251,13 @@ export default function AccessPage() {
               { key: "name", label: "Nom affiché", required: true },
               { key: "phone", label: "Téléphone", type: "tel" },
               { key: "email", label: "E-mail", type: "email" },
+              { key: "photoUrl", label: "Photo de l’élève (URL)", hint:"Image validée par le centre. Elle apparaît sur la carte étudiant." },
             ],
             initial: (record) => record,
           }}
         />
       )}
       {credentials && <CredentialsDialog value={credentials} onClose={() => setCredentials(null)} />}
-    </>
+    </div>
   );
 }

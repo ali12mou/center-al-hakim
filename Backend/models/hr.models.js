@@ -136,6 +136,7 @@ assignmentSchema.index({ staffId: 1, active: 1 });
 
 const planningSchema = new mongoose.Schema(
   {
+    groupId: { ...text, default: "" },
     staffId: ref("Staff"),
     assignmentId: ref("Assignment", false),
     date: { ...day, required: true },

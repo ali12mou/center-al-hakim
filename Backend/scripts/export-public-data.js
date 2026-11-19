@@ -9,12 +9,15 @@ import {
   getStaticPortal,
 } from "../services/platform.service.js";
 import { Course } from "../models/index.js";
+import { getPublicCentre } from "../services/site.service.js";
+import { siteDefaults } from "../data/siteSettings.js";
 
 dotenv.config({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
 // Ce snapshot contient exclusivement les publications publiques, jamais les inscrits,
 // les contacts, les identifiants, les sessions ou les réponses aux évaluations.
 export async function exportPublicData() {
   let catalogue = courses;
+  let publicCentre = { ...centre, ...siteDefaults };
   let portal = getStaticPortal();
   if (process.env.MONGODB_URI) {
     try {
@@ -25,6 +28,7 @@ export async function exportPublicData() {
         .select("-_id -__v")
         .lean();
       portal = await getPublicPortal();
+      publicCentre = await getPublicCentre();
     } catch {
       console.log("Export public : utilisation du contenu de présentation.");
     } finally {
@@ -40,7 +44,7 @@ export async function exportPublicData() {
     JSON.stringify({
       courses: catalogue,
       departments,
-      centre,
+      centre: publicCentre,
       content: siteContent,
       portal,
     }),

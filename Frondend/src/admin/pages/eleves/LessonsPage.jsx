@@ -97,6 +97,7 @@ export default function LessonsPage() {
         wide: true,
         fields: [
           courseField(),
+          { key: "groupId", label: "Groupe (facultatif)", hint: "Identifiant identique à celui du dossier de formation. Vide : tous les groupes de cette formation." },
           { key: "kind", label: "Type de contenu", type: "select", options: Object.entries(LESSON_KINDS) },
           { key: "title", label: "Titre", required: true, wide: true, max: 200 },
           { key: "description", label: "Résumé (affiché sous le titre)", type: "textarea", rows: 2, max: 2000 },

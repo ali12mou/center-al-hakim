@@ -152,7 +152,7 @@ async function deliverOtp(user, code, req, purpose = "login") {
     device: describeAgent(clientAgent(req)),
   });
   if (!mailConfigured()) {
-    if (process.env.NODE_ENV === "production")
+    if (process.env.NODE_ENV === "production" || process.env.OTP_DELIVERY !== "console")
       throw new MailError(
         "L’envoi du code par e-mail n’est pas configuré sur le serveur (SMTP).",
       );
@@ -166,13 +166,6 @@ async function deliverOtp(user, code, req, purpose = "login") {
     await sendMail({ to: user.email, ...message });
   } catch (error) {
     console.error("[OTP] Envoi de l’e-mail impossible :", error.message);
-    // Développement : un SMTP en panne ne bloque pas l’accès, le code passe par le terminal.
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `\n[OTP] Secours terminal — code pour ${user.username} (${user.email}) : ${code}\n`,
-      );
-      return "console";
-    }
     throw new MailError(
       "Le code de vérification n’a pas pu être envoyé par e-mail. Réessayez dans un instant.",
     );

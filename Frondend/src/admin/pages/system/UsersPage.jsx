@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, KeyRound, LogOut, Pencil, Power, Trash2, UserPlus } from "lucide-react";
 import Dialog from "../../../components/Dialog.jsx";
 import FormDialog from "../../components/FormDialog.jsx";
@@ -52,6 +52,9 @@ export default function UsersPage() {
   const { data, error: loadError, reload } = useRemote("/system/users");
   const [editor, setEditor] = useState(null);
   const [secret, setSecret] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState("");
+  useEffect(() => { setCopied(false); setCopyError(""); }, [secret]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const items = data?.items || [];
@@ -209,6 +212,10 @@ export default function UsersPage() {
           </p>
           <dl className="secret-box">
             <div>
+              <dt>Lien de connexion</dt>
+              <dd><a href={new URL("/admin/login", window.location.origin).href}>{new URL("/admin/login", window.location.origin).href}</a></dd>
+            </div>
+            <div>
               <dt>Nom d’utilisateur</dt>
               <dd>{secret.user.username}</dd>
             </div>
@@ -216,13 +223,22 @@ export default function UsersPage() {
               <dt>Mot de passe temporaire</dt>
               <dd>
                 <code>{secret.password}</code>
-                <button type="button" className="panel-action" onClick={() => navigator.clipboard?.writeText(secret.password)}>
-                  <Copy size={14} /> Copier
-                </button>
               </dd>
             </div>
           </dl>
+          {copyError && <p role="alert">{copyError}</p>}
           <div className="admin-editor-actions">
+            <button type="button" className="button button-outline" onClick={async () => {
+              setCopyError("");
+              try {
+                await navigator.clipboard.writeText(`${new URL("/admin/login", window.location.origin).href}\nNom d’utilisateur : ${secret.user.username}\nMot de passe temporaire : ${secret.password}`);
+                setCopied(true);
+              } catch {
+                setCopyError("La copie est indisponible. Sélectionnez les identifiants affichés pour les copier.");
+              }
+            }}>
+              <Copy size={16} /> {copied ? "Accès copiés" : "Copier les accès"}
+            </button>
             <button className="button" onClick={() => setSecret(null)}>
               J’ai noté le mot de passe
             </button>

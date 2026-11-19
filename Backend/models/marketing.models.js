@@ -67,6 +67,11 @@ const prospectSchema = new mongoose.Schema(
     notes: { ...text, maxlength: 2000, default: "" },
     // Accord pour recevoir les informations commerciales du centre.
     consent: { type: Boolean, default: false },
+    consentAt: Date,
+    consentChannels: { type: [String], enum: ["phone","whatsapp","email"], default: [] },
+    campaignId: { type: mongoose.Schema.Types.ObjectId, ref: "PortalPublication" },
+    nextFollowUpAt: Date,
+    enrollmentValidatedAt: Date,
     nextFollowUp: { ...day, default: undefined },
     agentId: ref("MarketingAgent", false),
     agentName: { ...text, default: "" },

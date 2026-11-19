@@ -110,6 +110,34 @@ const person = [
   }),
 ];
 export const sections = {
+  publications: {
+    title: "Bannières et annonces ciblées",
+    description: "Publiez sur le site public, dans l’espace étudiant ou marketing. Les dates et le ciblage sont appliqués par le serveur.",
+    publicPath: "/",
+    fields: [common[0],field("description","Description courte","textarea"),field("body","Texte complémentaire","textarea"),
+      field("audiences","Audiences","choices",{default:[],options:[["public","Site public"],["student","Étudiants"],["marketing","Marketing"]]}),
+      field("courseId","Formation ciblée (facultatif)","course"),field("groupId","Identifiant du groupe (facultatif)"),
+      field("placement","Emplacement","select",{options:[["banner","Bannière / accueil"],["footer","Pied de page"]],default:"banner"}),
+      field("startsAt","Début de publication","date"),field("endsAt","Fin de publication","date"),
+      field("order","Ordre","number",{default:1}),field("buttonLabel","Texte du bouton"),field("buttonLink","Lien du bouton"),
+      field("imageUrl","Image","image"),common[4],field("archived","Archiver","checkbox")],
+  },
+  presentations: {
+    title: "Présentation du centre",
+    description: "Créez les diapositives du bloc de présentation. Publiez-les séparément et choisissez leur ordre de défilement.",
+    publicPath: "/centre",
+    fields: [
+      field("eyebrow", "Surtitre"), common[0],
+      field("accent", "Suite du titre (en couleur)"),
+      field("description", "Présentation", "textarea"),
+      field("body", "Notre engagement", "textarea"),
+      field("values", "Points clés (un par ligne)", "lines"),
+      field("buttonLabel", "Texte du bouton"),
+      field("buttonLink", "Lien du bouton", "text", { hint: "Exemples : /contact, /formations, /inscription" }),
+      field("order", "Ordre d’affichage", "number", { default: 1 }),
+      field("imageUrl", "Photo de présentation", "image"), common[4],
+    ],
+  },
   slides: {
     title: "Accueil",
     description:
@@ -163,6 +191,7 @@ export const sections = {
       common[0],
       field("category", "Catégorie"),
       field("author", "Auteur"),
+      field("videoUrl", "Vidéo de l’actualité", "video", { hint: "MP4 ou WebM, 60 Mo maximum. Les vidéos de 2 minutes et plus sont acceptées : aucune limite de durée. L’image sert de couverture au lecteur." }),
       ...common.slice(1),
     ],
   },
@@ -220,7 +249,7 @@ export const sections = {
     ],
   },
   courses: {
-    title: "Courses",
+    title: "Compétences et formations",
     description: "Gérez les formations, programmes, niveaux et publications.",
     publicPath: "/courses",
     fields: [
@@ -228,7 +257,8 @@ export const sections = {
         required: true,
         hint: "Lettres minuscules, chiffres et tirets. Exemple : anglais-professionnel.",
       }),
-      field("title", "Nom de la formation", "text", { required: true }),
+      field("title", "Nom de la compétence / formation", "text", { required: true }),
+      field("courseType","Type","select",{options:[["formation","Formation"],["competence","Compétence"]],default:"formation"}),
       field("department", "Département", "select", { options: departments }),
       field("description", "Description", "textarea"),
       field("topics", "Programme (un point par ligne)", "lines"),

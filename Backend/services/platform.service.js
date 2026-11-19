@@ -8,9 +8,15 @@ import {
   Assessment,
   Partner,
   HomeSlide,
+  CentrePresentation,
   PlatformSetting,
 } from "../models/platform.models.js";
 import { courses } from "../data/catalogue.js";
+import { initialPresentations } from "../data/centrePresentations.js";
+import { initialBlogExamples } from "../data/blogExamples.js";
+import { PortalPublication } from "../models/portal.models.js";
+import { publicationsFor } from "./portal.service.js";
+import { initialPortalBanners } from "../data/portalBanners.js";
 import {
   initialSkills,
   initialBusinesses,
@@ -31,16 +37,18 @@ export const resourceModels = {
   assessments: Assessment,
   partners: Partner,
   slides: HomeSlide,
+  presentations: CentrePresentation,
+  publications: PortalPublication,
 };
 export async function getPublicPortal() {
   const entries = await Promise.all(
     Object.entries(resourceModels)
-      .filter(([key]) => key !== "courses")
+      .filter(([key]) => !["courses", "publications"].includes(key))
       .map(async ([key, model]) => {
         const records = await model
           .find({ published: true })
           // Le diaporama suit l’ordre choisi ; le reste, du plus récent au plus ancien.
-          .sort(key === "slides" ? { order: 1, createdAt: 1 } : { createdAt: -1 })
+          .sort(["slides", "presentations"].includes(key) ? { order: 1, createdAt: 1 } : { createdAt: -1 })
           .limit(100)
           .select("-__v")
           .lean();
@@ -53,7 +61,7 @@ export async function getPublicPortal() {
         return [key, records];
       }),
   );
-  return Object.fromEntries(entries);
+  return { ...Object.fromEntries(entries), publications: await publicationsFor("public") };
 }
 export function getStaticPortal() {
   const addIds = (data, key) =>
@@ -65,7 +73,7 @@ export function getStaticPortal() {
   return {
     competences: addIds(initialSkills, "skills"),
     informations: addIds(initialInformation, "information"),
-    blog: [],
+    blog: addIds(initialBlogExamples, "blog"),
     businesses: addIds(initialBusinesses, "businesses"),
     certifications: addIds(initialCertifications, "certifications"),
     assessments: addIds(initialAssessments, "assessments").map((item) => ({
@@ -77,6 +85,8 @@ export function getStaticPortal() {
     })),
     partners: addIds(initialPartners, "partners"),
     slides: addIds(initialSlides, "slides"),
+    presentations: addIds(initialPresentations, "presentations"),
+    publications: addIds(initialPortalBanners,"publications"),
   };
 }
 // Champs ajoutés aux formations après leur création : on les complète (vides)
@@ -93,6 +103,22 @@ async function completeCourseFields() {
 }
 
 export async function seedPlatform() {
+  if (!(await PlatformSetting.exists({_id:"portal-welcome-v1"}))) {
+    if (!(await PortalPublication.exists({title:initialPortalBanners[0].title}))) await PortalPublication.insertMany(initialPortalBanners);
+    await PlatformSetting.updateOne({_id:"portal-welcome-v1"},{$setOnInsert:{initializedAt:new Date()}},{upsert:true});
+  }
+  if (!(await PlatformSetting.exists({ _id: "blog-examples-v1" }))) {
+    for (const article of initialBlogExamples)
+      if (!(await BlogPost.exists({ title: article.title }))) await BlogPost.create(article);
+    await PlatformSetting.updateOne({ _id: "blog-examples-v1" },
+      { $setOnInsert: { initializedAt: new Date() } }, { upsert: true });
+  }
+  if (!(await PlatformSetting.exists({ _id: "centre-presentations" }))) {
+    if ((await CentrePresentation.countDocuments()) === 0)
+      await CentrePresentation.insertMany(initialPresentations);
+    await PlatformSetting.updateOne({ _id: "centre-presentations" },
+      { $setOnInsert: { initializedAt: new Date() } }, { upsert: true });
+  }
   await completeCourseFields();
   // Le diaporama est arrivé après la première installation : il a son propre
   // repère, pour ne pas recréer les diapositives que l’administration supprime.

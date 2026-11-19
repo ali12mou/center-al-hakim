@@ -1,90 +1,18 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
-import Brand from "./Brand.jsx";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { whatsappLink } from "./whatsapp.js";
-
-export default function Footer({ centre, departments, onPrivacy, onLegal }) {
-  return (
-    <footer className="footer">
-      <div className="container">
-        <div className="footer-intro">
-          <div><span className="eyebrow">VOTRE PROCHAINE ÉTAPE COMMENCE ICI</span><h2>Apprendre aujourd’hui.<br />Aller plus loin demain.</h2></div>
-          <Link to="/formations" className="button button-white">Explorer nos formations <ArrowUpRight size={18} /></Link>
-        </div>
-        <div className="footer-grid">
-          <div className="footer-brand">
-            <a href="/#accueil" aria-label="Retour à l’accueil">
-              <Brand light />
-            </a>
-            <p>
-              Des compétences pour aujourd’hui.
-              <br />
-              Des perspectives pour demain.
-            </p>
-            <span className="footer-slogan">{centre.slogan}</span>
-          </div>
-          <div>
-            <h3>Explorez le centre</h3>
-            <Link to="/formations">Nos formations</Link>
-            <Link to="/centre">Notre mission</Link>
-            <Link to="/entreprises">Formations entreprises</Link>
-            <Link to="/contact">Contact</Link>
-            <Link to="/inscription">
-              Préinscription <ArrowUpRight size={13} />
-            </Link>
-          </div>
-          <div>
-            <h3>Nos domaines</h3>
-            {departments.map((department) => (
-              <Link to={`/formations?pole=${department.id}`} key={department.id}>
-                {department.name}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <h3>Restons en contact</h3>
-            <a href={`tel:${centre.phoneLink}`}>
-              <Phone size={14} /> {centre.phone}
-            </a>
-            <a href={`mailto:${centre.email}`}>
-              <Mail size={14} /> {centre.email}
-            </a>
-            <a
-              href={whatsappLink(centre)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              WhatsApp <ArrowUpRight size={14} />
-            </a>
-            <p className="footer-address">
-              <MapPin size={14} />
-              <span>
-                {centre.address}
-                <br />
-                {centre.landmark}
-              </span>
-            </p>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <span>
-            © {new Date().getFullYear()} AL-HAKIM CENTER. Tous droits réservés.
-          </span>
-          <div>
-            <button onClick={onLegal}>Informations du centre</button>
-            <button onClick={onPrivacy}>Confidentialité</button>
-            <a
-              href="#contenu"
-              onClick={(event) => {
-                event.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            >
-              Retour en haut ↑
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+import { footerDefaults } from "../../../Backend/data/siteSettings.js";
+import "./footer.css";
+const FooterLink=({url,children,...props})=>url.startsWith('/')?<Link to={url} {...props}>{children}</Link>:<a href={url} {...props}>{children}</a>;
+export default function Footer({centre,onPrivacy,onLegal,campaigns=[]}){
+  const footer={...footerDefaults,...centre.footer};
+  return <footer className="footer footer-professional"><div className="container">
+    <div className="footer-signup"><div><span className="footer-overline">AL-HAKIM CENTER</span><h2>{footer.ctaTitle}</h2><p>{footer.ctaDescription}</p></div><div className="footer-signup-actions"><FooterLink className="button footer-primary" url={footer.primaryUrl}>{footer.primaryLabel}<ArrowUpRight size={18}/></FooterLink><FooterLink className="button footer-secondary" url={footer.secondaryUrl}>{footer.secondaryLabel}</FooterLink></div></div>
+    {campaigns.map(item=><div className="footer-campaign" key={item._id}><div><strong>{item.title}</strong><p>{item.description}</p></div>{item.buttonLink&&<FooterLink url={item.buttonLink}>{item.buttonLabel||'Découvrir la campagne'} <ArrowUpRight size={17}/></FooterLink>}</div>)}
+    <div className="footer-columns"><div className="footer-brand"><a href="/" aria-label={`${centre.name}, accueil`} className="footer-logo"><img src={footer.logoUrl} alt={centre.name}/></a><strong>{footer.introduction}</strong><p>{footer.description}</p><span className="footer-motto">{footer.motto}</span></div>
+      <div className="footer-links"><h3>{footer.discoverTitle}</h3>{footer.links.map(item=><FooterLink key={item.url+item.label} url={item.url}>{item.label}</FooterLink>)}</div>
+      <div className="footer-links"><h3>{footer.domainsTitle}</h3>{footer.domains.map(item=><FooterLink key={item.url+item.label} url={item.url}>{item.label}</FooterLink>)}</div>
+      <div className="footer-contact"><h3>{footer.contactTitle}</h3><a href={`tel:${centre.phoneLink}`}><Phone size={17}/><span>{centre.phone}</span></a><a href={`mailto:${centre.email}`}><Mail size={17}/><span>{centre.email}</span></a><div className="footer-location"><MapPin size={18}/><span>{centre.address}<small>{centre.landmark}</small></span></div><a className="footer-whatsapp" href={whatsappLink(centre)} target="_blank" rel="noreferrer"><MessageCircle size={18}/>{footer.whatsappLabel}</a>{centre.mapUrl&&<a href={centre.mapUrl} target="_blank" rel="noreferrer">{footer.mapLabel}<ArrowUpRight size={15}/></a>}</div>
+    </div><div className="footer-bottom"><span>© {new Date().getFullYear()} {centre.name}. {footer.copyright}</span><div>{onLegal&&<button type="button" onClick={onLegal}>{footer.legalLabel}</button>}{onPrivacy&&<button type="button" onClick={onPrivacy}>{footer.privacyLabel}</button>}{footer.termsUrl&&<FooterLink url={footer.termsUrl}>{footer.termsLabel}</FooterLink>}<button type="button" onClick={()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})}>{footer.backToTopLabel}<ArrowUp size={14}/></button></div></div>
+  </div></footer>;
 }

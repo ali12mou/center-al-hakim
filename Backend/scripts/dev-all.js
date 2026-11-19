@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { statSync, watch } from "node:fs";
+import { readFileSync, statSync, watch } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -46,7 +46,8 @@ let apiStartedAt = 0;
 let restartTimer;
 function startApi() {
   apiStartedAt = Date.now();
-  api = run(["index.js"], { cwd: backend });
+  const currentEnv = dotenv.parse(readFileSync(path.join(backend, ".env")));
+  api = run(["index.js"], { cwd: backend, env: { ...process.env, ...currentEnv } });
 }
 function restartApi() {
   if (stopping || api.restarting) return;
@@ -57,7 +58,7 @@ function restartApi() {
 }
 startApi();
 watch(backend, { recursive: true }, (_event, file) => {
-  if (!file || !/\.(js|json)$/.test(file)) return;
+  if (!file || !(file === ".env" || /\.(js|json)$/.test(file))) return;
   if (/^(node_modules|uploads)[\\/]/.test(file)) return;
   let modifiedAt = Infinity; // fichier supprimé ou renommé
   try {

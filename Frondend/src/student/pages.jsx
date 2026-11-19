@@ -115,8 +115,8 @@ export function HomePage() {
   return (
     <>
       <section className="st-hero">
-        <span>Bonjour,</span>
-        <h1>{first} 👋</h1>
+        <span>Bonjour {first},</span>
+        <h1>Mon tableau de bord</h1>
         <p>Retrouvez ici vos cours, votre progression et vos paiements.</p>
       </section>
       {me.error ? (

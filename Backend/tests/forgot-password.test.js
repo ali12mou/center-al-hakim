@@ -2,6 +2,7 @@
 // sur une base MongoDB de test jetable. Sans SMTP, le code est lu dans la console.
 process.env.ADMIN_OTP ??= "off";
 delete process.env.SMTP_HOST;
+process.env.OTP_DELIVERY = "console";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";

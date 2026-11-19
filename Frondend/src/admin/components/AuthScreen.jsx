@@ -474,15 +474,14 @@ function OtpStep({
       </span>
       <h1>{title}</h1>
       <p className="login-lead">
-        Nous avons envoyé un code à 6 chiffres à <strong>{challenge.email}</strong>.
+        {challenge.console ? "Un code à 6 chiffres a été généré pour " : "Nous avons envoyé un code à 6 chiffres à "}<strong>{challenge.email}</strong>.
         Saisissez-le {lead}
       </p>
       {challenge.console && (
         <p className="auth-notice login-dev-notice" role="status">
           <Info size={17} />
           <span>
-            Mode développement : l’e-mail n’a pas pu être envoyé (SMTP non configuré ou
-            refusé par Gmail).
+            Mode développement : l’envoi par e-mail est indisponible.
             Le code s’affiche dans le terminal de <strong>npm run dev</strong>, sur la
             ligne <code>[OTP]</code>.
           </span>

@@ -1132,6 +1132,10 @@
 }
 
 /* Documents imprimables : facture, reçu, bulletin */
+.site-settings { display:grid; gap:24px; }
+.site-link-row { display:grid;grid-template-columns:1fr 1.3fr auto;gap:16px;align-items:end;margin-bottom:16px; }
+@media(max-width:650px){.site-link-row{grid-template-columns:1fr;}.site-settings .form-grid{grid-template-columns:1fr;}}
+
 .print-dialog {
   width: min(860px, calc(100vw - 36px));
 }
@@ -1310,7 +1314,17 @@
 @media print {
   @page {
     size: A4;
-    margin: 14mm;
+    margin: 8mm;
+  }
+  body:has(> .print-dialog[open]) {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  body:has(> .print-dialog[open]) > :not(.print-dialog) {
+    display: none !important;
   }
   body * {
     visibility: hidden !important;
@@ -1321,9 +1335,17 @@
     visibility: visible !important;
   }
   .print-dialog {
-    position: absolute !important;
-    inset: 0 !important;
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
     width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    max-block-size: none !important;
     max-height: none !important;
     box-shadow: none !important;
     overflow: visible !important;
@@ -1345,6 +1367,30 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+  .print-half-sheet .print-doc {
+    min-height: 128mm;
+    padding: 3mm;
+    font-size: 9pt;
+    line-height: 1.4;
+    color: #142a4a;
+    background: white;
+  }
+  .print-half-sheet .doc-header { padding-bottom: 3mm; gap: 5mm; }
+  .print-half-sheet .doc-brand img { width: 15mm; height: 15mm; }
+  .print-half-sheet .doc-brand strong { font-size: 12pt; }
+  .print-half-sheet .doc-title h3 { font-size: 15pt; }
+  .print-half-sheet .doc-facts { margin-block: 3mm; gap: 2mm 5mm; }
+  .print-half-sheet .doc-parties { margin-block: 3mm; gap: 5mm; }
+  .print-half-sheet .doc-parties div { padding: 2mm 3mm; }
+  .print-half-sheet .doc-table { margin-block: 2mm 3mm; }
+  .print-half-sheet .doc-table :is(th, td) { padding: 2mm; }
+  .print-half-sheet .doc-table thead th { font-size: 8.5pt; }
+  .print-half-sheet .doc-table .doc-grand th { font-size: 10pt; }
+  .print-half-sheet .doc-words { margin-bottom: 3mm; }
+  .print-half-sheet .doc-footer { margin-top: 4mm; gap: 5mm; }
+  .print-half-sheet .doc-sign { padding-top: 12mm; min-width: 48mm; }
+  .print-half-sheet :is(.doc-header, .doc-facts, .doc-parties, .doc-footer, tr) { break-inside: avoid; }
+  .print-half-sheet .doc-table thead { display: table-header-group; }
 }
 
 /* Écrans moyens et petits */

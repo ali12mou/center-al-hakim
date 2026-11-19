@@ -50,6 +50,7 @@ export default function AnnouncementsPage() {
           { key: "title", label: "Titre", required: true, wide: true, max: 200 },
           { key: "body", label: "Message", type: "textarea", rows: 6, max: 5000 },
           courseField({ label: "Destinataires", required: false, placeholder: "— Tous les students —" }),
+          { key: "groupId", label: "Groupe ciblé (facultatif)" },
           { key: "date", label: "Date", type: "date", required: true, default: today },
           { key: "pinned", label: "Épingler en haut de la liste", type: "checkbox" },
           { key: "published", label: "Visible par les students", type: "checkbox", default: true },

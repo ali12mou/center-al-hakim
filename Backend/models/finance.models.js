@@ -82,6 +82,7 @@ const installmentSchema = new mongoose.Schema(
 // Dossier financier d’un student pour une formation.
 const studentAccountSchema = new mongoose.Schema(
   {
+    groupId: { ...text, default: "" },
     reference: { ...text, required: true, unique: true },
     registrationId: ref("Registration", false),
     studentName: { ...text, required: true, maxlength: 120 },

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { NavLink, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, ChartNoAxesColumn, House, LogIn, UserRound, Wallet } from "lucide-react";
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import Dialog from "../components/Dialog.jsx";
+import { BookOpen, ChartNoAxesColumn, House, LayoutDashboard, LogIn, MoreHorizontal, UserRound, Wallet } from "lucide-react";
 import { LOGO } from "../components/logoParts.js";
 import { onStudentAuthEvent, setStudentCsrf, studentApi } from "./studentApi.js";
 import { PasswordForm, PasswordInput, StudentContext, useInstallPrompt } from "./shared.jsx";
 import { AnnouncementsPage, CoursesPage, HomePage, PaymentsPage, ProfilePage, ProgressPage } from "./pages.jsx";
 import "./student.css";
+import StudentWelcomePage from "./WelcomePage.jsx";
+import "./welcome.css";
 
 // Application des students (PWA), servie sous /etudiant. Elle ne parle qu’à
 // /api/student : aucune page ni donnée de l’administration n’y est accessible.
@@ -121,8 +124,10 @@ const TABS = [
 
 function Shell() {
   const { pathname } = useLocation();
+  const [more,setMore]=useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
+    setMore(false);
   }, [pathname]);
   return (
     <div className="st-app">
@@ -135,7 +140,8 @@ function Shell() {
       </header>
       <main className="st-content">
         <Routes>
-          <Route index element={<HomePage />} />
+          <Route index element={<StudentWelcomePage />} />
+          <Route path="dashboard" element={<HomePage />} />
           <Route path="cours" element={<CoursesPage />} />
           <Route path="suivi" element={<ProgressPage />} />
           <Route path="paiements" element={<PaymentsPage />} />
@@ -144,17 +150,21 @@ function Shell() {
           <Route path="*" element={<Navigate to="/etudiant" replace />} />
         </Routes>
       </main>
+      <aside className="st-sidebar" aria-label="Menus de l’espace étudiant"><div className="st-sidebar-brand"><img src="/Untitled-2.png" alt=""/><span>AL-HAKIM<br/>CENTER</span></div><strong>MON ESPACE PERSONNEL</strong>{[["/etudiant","Accueil",House],["/etudiant/dashboard","Tableau de bord",LayoutDashboard],...TABS.slice(1)].map(([to,label,Icon])=><NavLink key={to} to={to} end={to==='/etudiant'}><Icon size={20}/>{label}</NavLink>)}<NavLink to="/etudiant/annonces"><MessageIcon/>Annonces</NavLink></aside>
       <nav className="st-tabbar" aria-label="Navigation de l’espace student">
-        {TABS.map(([to, label, Icon]) => (
+        {TABS.slice(0,4).map(([to, label, Icon]) => (
           <NavLink key={to} to={to} end={to === "/etudiant"}>
             <Icon size={21} />
             <span>{label}</span>
           </NavLink>
         ))}
+        <button type="button" onClick={()=>setMore(true)} aria-expanded={more}><MoreHorizontal size={21}/><span>Plus</span></button>
       </nav>
+      {more&&<Dialog title="Votre espace étudiant" onClose={()=>setMore(false)} className="st-more-dialog"><nav className="st-more-menu" aria-label="Plus de menus"><Link to="/etudiant/dashboard"><LayoutDashboard size={19}/>Tableau de bord</Link><Link to="/etudiant/annonces"><MessageIcon/>Annonces</Link><Link to="/etudiant/profil"><UserRound size={19}/>Mon profil</Link></nav></Dialog>}
     </div>
   );
 }
+function MessageIcon(){return <BookOpen size={19}/>;}
 
 export default function StudentApp() {
   const [auth, setAuth] = useState(null);

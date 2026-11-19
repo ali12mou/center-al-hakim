@@ -10,6 +10,7 @@ import { resourceModels } from "../services/platform.service.js";
 import { contentSchemas, personSchema } from "../validators/admin.validator.js";
 import { hashPassword } from "../services/password.service.js";
 import { can } from "../config/permissions.js";
+import { PortalAudit } from "../models/portal.models.js";
 import { Leave, Attendance, PayAdjustment } from "../models/hr.models.js";
 import { Expense, StaffPayment } from "../models/finance.models.js";
 import { today } from "../services/dates.js";
@@ -206,7 +207,7 @@ export async function listResource(req, res, next) {
     const [items, total] = await Promise.all([
       model
         .find(filter)
-        .sort({ createdAt: -1 })
+        .sort(["slides", "presentations"].includes(req.params.resource) ? { order: 1, createdAt: 1 } : { createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),
@@ -258,6 +259,14 @@ export async function saveResource(req, res, next) {
             .join(" · "),
         });
     const data = parsed.data;
+    if (resource === "publications") {
+      const prior = req.params.id ? await model.findById(req.params.id).lean() : {};
+      const merged = { ...prior, ...data };
+      if (merged.startsAt && merged.endsAt && merged.endsAt < merged.startsAt)
+        return res.status(400).json({ error: "La fin de publication doit suivre le début." });
+      if (merged.published && !merged.audiences?.length)
+        return res.status(400).json({ error: "Choisissez au moins une audience." });
+    }
     if (resource === "courses" && req.params.id && data.id) {
       const existing = await Course.findById(req.params.id);
       if (
@@ -308,6 +317,7 @@ export async function saveResource(req, res, next) {
       });
     if (!record)
       return res.status(404).json({ error: "Enregistrement introuvable." });
+    if(resource==='publications') await PortalAudit.create({actorId:req.admin._id,actorRole:'admin',action:'publication_saved',entityId:record._id,changes:data});
     res.status(req.params.id ? 200 : 201).json({ item: safePerson(record) });
   } catch (error) {
     next(error);

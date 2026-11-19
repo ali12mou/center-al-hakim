@@ -15,6 +15,8 @@ import PublicNav from "./components/PublicNav.jsx";
 import LogoLoader from "./components/LogoLoader.jsx";
 import Partners from "./components/Partners.jsx";
 import LatestInformations from "./components/LatestInformations.jsx";
+import LatestBlog from "./components/LatestBlog.jsx";
+import PublicAnnouncements from "./components/PublicAnnouncements.jsx";
 import { PrivacyContent, LegalContent } from "./components/LegalNotices.jsx";
 import { whatsappLink } from "./components/whatsapp.js";
 import { useLanguage } from './context/LanguageContext.jsx';
@@ -99,6 +101,7 @@ export default function LandingSite() {
       <main id="contenu">
         <PublicNav />
         <Home content={data.content} slides={data.portal?.slides} />
+        <PublicAnnouncements items={data.portal?.publications||[]}/>
         <LatestInformations items={data.portal?.informations} />
         <Formations
           courses={data.courses}
@@ -108,12 +111,14 @@ export default function LandingSite() {
           departmentRequest={departmentRequest}
         />
         <Centre
+          presentations={data.portal?.presentations}
           content={data.content}
           departments={data.departments}
           onDepartment={exploreDepartment}
         />
         <Entreprises content={data.content} onRequest={enterpriseRequest} />
         <Partners items={data.portal?.partners || []} />
+        <LatestBlog items={data.portal?.blog || []}/>
         <Faq items={data.content.faq} />
         <Contact
           centre={data.centre}
@@ -125,6 +130,7 @@ export default function LandingSite() {
         />
       </main>
       <Footer
+        campaigns={(data.portal?.publications || []).filter(item=>item.placement==='footer')}
         centre={data.centre}
         departments={data.departments}
         onPrivacy={() => setInformation("privacy")}

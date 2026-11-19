@@ -5,7 +5,7 @@ import path from "node:path";
 
 export const UPLOAD_DIR = fileURLToPath(new URL("../uploads/", import.meta.url));
 export const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
-// Vidéos : uniquement pour le diaporama de l’accueil.
+// Vidéos : diaporama d’accueil et articles de blog (sans limite de durée).
 export const VIDEO_TYPES = ["video/mp4", "video/webm"];
 export const UPLOAD_TYPES = [...IMAGE_TYPES, ...VIDEO_TYPES];
 export const MAX_UPLOAD = 10 * 1024 * 1024;

@@ -11,6 +11,7 @@
     "Frondend"
   ],
   "scripts": {
+    "smtp:check": "node Backend/scripts/check-smtp.js",
     "dev": "node Backend/scripts/dev-all.js",
     "build": "node Backend/scripts/build-frontend.js",
     "start": "node Backend/index.js",

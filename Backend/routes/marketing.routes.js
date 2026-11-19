@@ -6,8 +6,10 @@ import {
   MarketingAgent,
   MarketingSession,
   MarketingProspect,
+  MarketingFollowup,
 } from "../models/marketing.models.js";
 import { Course } from "../models/index.js";
+import { mountMarketingPortal } from "./portal.routes.js";
 import { hashPassword, verifyPassword, hashToken } from "../services/password.service.js";
 import {
   safeEqual,
@@ -236,6 +238,7 @@ export function createMarketingRouter(isDatabaseReady) {
   );
 
   router.use(requireAgent);
+  mountMarketingPortal(router);
 
   router.post(
     "/auth/logout",
@@ -319,5 +322,13 @@ export function createMarketingRouter(isDatabaseReady) {
       res.json({ item: publicProspect(prospect), items: await prospectHistory(prospect._id) });
     }),
   );
+  router.post('/prospects/:id/interactions',wrap(async(req,res)=>{
+    const prospect=await ownProspect(req);
+    const data=parseBody(z.object({note:z.string().trim().min(2).max(1000),nextFollowUpAt:z.string().datetime({offset:true}).optional()}).strict(),req.body,{});
+    if(data.nextFollowUpAt){prospect.nextFollowUpAt=new Date(data.nextFollowUpAt);prospect.nextFollowUp=new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Djibouti'}).format(prospect.nextFollowUpAt);await prospect.save();}
+    await MarketingFollowup.create({prospectId:prospect._id,from:prospect.status,to:prospect.status,note:data.note,nextFollowUp:prospect.nextFollowUp,by:agentActor(req.agent)});
+    await logActivity(req.agent._id,'prospect_updated',req,{prospectId:prospect._id,details:'Interaction consignée.'});
+    res.status(201).json({message:'Interaction enregistrée.'});
+  }));
   return router;
 }

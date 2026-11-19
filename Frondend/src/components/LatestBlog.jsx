@@ -1,0 +1,4 @@
+import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
+import { NewsCard } from "../pages/BlogPage.jsx";
+export default function LatestBlog({items=[]}){const latest=items.slice().sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,3);if(!latest.length)return null;return <section className="section latest-blog"><div className="container"><div className="section-heading"><div><span className="eyebrow">LE JOURNAL D’AL-HAKIM CENTER</span><h2>Les dernières actualités du centre.</h2><p>Nos annonces, initiatives et conseils pour avancer ensemble.</p></div><Link className="button button-outline" to="/blog">Tout le journal<ArrowUpRight size={17}/></Link></div><div className="news-grid">{latest.map(item=><NewsCard key={item._id} item={item}/>)}</div></div></section>;}

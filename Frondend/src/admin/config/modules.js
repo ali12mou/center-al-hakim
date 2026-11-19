@@ -104,7 +104,10 @@ export const MODULE_MENUS = [
         label: "Contenu du site",
         items: [
           item("/admin/slides", "Accueil", House, "centre.slides"),
-          item("/admin/courses", "Courses", BookOpen, "centre.courses"),
+          item("/admin/presentations", "Présentation du centre", House, "centre.presentations"),
+          item("/admin/publications", "Bannières et annonces", Info, "centre.publications"),
+          item("/admin/site-settings", "Paramètres du site", Info, "centre.settings"),
+          item("/admin/courses", "Compétence / formation", BookOpen, "centre.courses"),
           item("/admin/competences", "Compétences", GraduationCap, "centre.competences"),
           item("/admin/blog", "Blog", Newspaper, "centre.blog"),
           item("/admin/informations", "Informations", Info, "centre.informations"),
